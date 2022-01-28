@@ -23,7 +23,7 @@ export class RainDemo extends Demo {
     const loader = new THREE.TextureLoader()
     const floorDiffuse = await loader.loadAsync('./static/assets/image/floor_diffuse.jpg')
     const floorNormal = await loader.loadAsync('./static/assets/image/floor_normal.jpg')
-    const rainNormal = await loader.loadAsync('./static/assets/image/rain_on_floor_normal_map.png')
+    const rainNormal = await loader.loadAsync('./static/assets/image/rain_normal.png')
     const material = new RainOnFloorMaterial({ floorMap: floorDiffuse, floorNormalMap: floorNormal, rainMap: rainNormal })
     const geometry = new THREE.PlaneBufferGeometry(10, 10, 1, 1)
     // geometry.computeTangents()

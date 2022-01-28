@@ -3,7 +3,7 @@
 const utils = require('./utils')
 
 module.exports = {
-  entry: './src/App.js',
+  entry: ['@babel/polyfill', './src/App.js'],
   resolve: {
     modules: ['src', 'node_modules'],
     extensions: ['.js', '.ts'],
@@ -28,22 +28,12 @@ module.exports = {
         exclude: /(?:node_modules)/,
       },
       {
-        // For our normal typescript
-        test: /\.ts?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-          },
-        ],
-        exclude: /(?:node_modules)/,
-      },
-      {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(glsl|vs|fs)$/,
-        loader: 'ts-shader-loader',
+        loader: 'shader-loader',
       },
       {
         test: /\.worker\.js$/i,
