@@ -1,3 +1,4 @@
+import { Clock } from 'three'
 import { EventDispatcher } from 'three'
 import { App } from '../../App'
 import { Testcase } from '../Testcase'
@@ -12,8 +13,6 @@ export class Demo extends EventDispatcher {
   constructor(root) {
     super()
 
-    console.info('root', root)
-
     if (!root) return
 
     if (root instanceof App) {
@@ -23,5 +22,11 @@ export class Demo extends EventDispatcher {
       this.testcase = root
       this.app = root.app
     }
+
+    this.clock = new Clock()
+  }
+
+  update() {
+    console.info('testcase update')
   }
 }

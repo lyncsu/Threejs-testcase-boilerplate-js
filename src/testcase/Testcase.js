@@ -23,6 +23,13 @@ export class Testcase {
    * 初始化
    */
   init() {
-    new RainDemo(this.app)
+    this.rain = new RainDemo(this.app)
+  }
+
+  /**
+   * 更新demo
+   */
+  update() {
+    this.rain.update()
   }
 }

@@ -17,6 +17,8 @@ export class RainMaterial extends ShaderMaterial {
           type: 'm3',
           value: new Matrix3(),
         },
+        uLightColor: { value: params.light.color },
+        uLightPosition: { value: params.light.position },
       },
       vertexShader: VertexShader,
       fragmentShader: FragmentShader,

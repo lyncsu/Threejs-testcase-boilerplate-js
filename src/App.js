@@ -71,9 +71,8 @@ export class App {
   }
 
   render() {
-    console.info('render')
-
     this.renderer.render(this.scene, this.camera)
+    if (this.testcase) this.testcase.update()
   }
 
   resize() {

@@ -21,10 +21,10 @@ export class RainDemo extends Demo {
    * 初始化
    */
   async init() {
-    // const lightPosition = new THREE.Vector3(5, 5, 5)
-    // const spot = new THREE.SpotLight({ color: '#ff0000', intensity: 0.5 })
-    // spot.position.copy(lightPosition)
-    // this.app.scene.add(spot)
+    const lightPosition = new THREE.Vector3(0, 5, 5)
+    this.light = new THREE.PointLight(0xffffff)
+    this.light.position.copy(lightPosition)
+    this.app.scene.add(this.light)
 
     const geometry = new THREE.PlaneBufferGeometry(10, 10, 1, 1)
     geometry.computeTangents()
@@ -33,10 +33,17 @@ export class RainDemo extends Demo {
     const floorNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}floor_normal.jpg`)
     const rainNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}rain_normal.png`)
     floorNormal.wrapS = floorNormal.wrapT = THREE.RepeatWrapping
-    const material = new RainMaterial({ floorDiffuse, floorNormal, rainNormal })
+    this.material = new RainMaterial({ floorDiffuse, floorNormal, rainNormal, light: this.light })
 
-    const plane = new THREE.Mesh(geometry, material)
+    const plane = new THREE.Mesh(geometry, this.material)
     plane.rotation.x = -Math.PI / 2
     this.app.scene.add(plane)
+  }
+
+  update() {
+    const time = this.clock.getElapsedTime()
+    this.light.position.x = Math.sin(time) * 20
+    this.light.position.y = Math.cos(time) * 20
+    if (this.material) this.material.uniforms.uLightPosition.value = this.light.position
   }
 }
