@@ -1,6 +1,7 @@
 import * as THREE from 'three'
+import { Constant } from '../../Constant'
 import { Demo } from '../base/Demo'
-import { RainOnFloorMaterial } from './RainOnFloorMaterial'
+import { RainMaterial } from './RainMaterial'
 
 /**
  * 雨滴效果用例
@@ -20,14 +21,20 @@ export class RainDemo extends Demo {
    * 初始化
    */
   async init() {
-    const loader = new THREE.TextureLoader()
-    const floorDiffuse = await loader.loadAsync('./static/assets/image/floor_diffuse.jpg')
-    const floorNormal = await loader.loadAsync('./static/assets/image/floor_normal.jpg')
-    const rainNormal = await loader.loadAsync('./static/assets/image/rain_normal.png')
-    const material = new RainOnFloorMaterial({ floorMap: floorDiffuse, floorNormalMap: floorNormal, rainMap: rainNormal })
+    // const lightPosition = new THREE.Vector3(5, 5, 5)
+    // const spot = new THREE.SpotLight({ color: '#ff0000', intensity: 0.5 })
+    // spot.position.copy(lightPosition)
+    // this.app.scene.add(spot)
+
     const geometry = new THREE.PlaneBufferGeometry(10, 10, 1, 1)
-    // geometry.computeTangents()
-    // geometry.computeVertexNormals()
+    geometry.computeTangents()
+    const loader = new THREE.TextureLoader()
+    const floorDiffuse = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}floor_diffuse.jpg`)
+    const floorNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}floor_normal.jpg`)
+    const rainNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}rain_normal.png`)
+    floorNormal.wrapS = floorNormal.wrapT = THREE.RepeatWrapping
+    const material = new RainMaterial({ floorDiffuse, floorNormal, rainNormal })
+
     const plane = new THREE.Mesh(geometry, material)
     plane.rotation.x = -Math.PI / 2
     this.app.scene.add(plane)
