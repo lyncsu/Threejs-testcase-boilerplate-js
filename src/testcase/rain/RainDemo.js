@@ -25,9 +25,10 @@ export class RainDemo extends Demo {
     this.light = new THREE.PointLight(0xffffff)
     this.light.position.copy(lightPosition)
     this.app.scene.add(this.light)
+    const helper = new THREE.PointLightHelper(this.light, 1)
+    this.app.scene.add(helper)
 
     const geometry = new THREE.PlaneBufferGeometry(10, 10, 1, 1)
-    geometry.computeTangents()
     const loader = new THREE.TextureLoader()
     const floorDiffuse = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}floor_diffuse.jpg`)
     const floorNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}floor_normal.jpg`)
@@ -42,8 +43,9 @@ export class RainDemo extends Demo {
 
   update() {
     const time = this.clock.getElapsedTime()
-    this.light.position.x = Math.sin(time) * 20
-    this.light.position.y = Math.cos(time) * 20
+    this.light.position.x = Math.sin(time) * 15
+    this.light.position.y = 5 + Math.sin(time * 0.5) * 5
+    this.light.position.z = Math.cos(time) * 15
     if (this.material) this.material.uniforms.uLightPosition.value = this.light.position
   }
 }

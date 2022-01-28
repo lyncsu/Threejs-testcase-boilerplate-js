@@ -35,16 +35,16 @@ void main() {
 
   vec4 addedLights = vec4(0.0,0.0,0.0, 1.0);
   vec3 lightDirection = normalize(uLightPosition - vWorldPosition);
-  // diffuse lighting
+  // diffuse
   addedLights.rgb += clamp(dot(lightDirection, normal), 0.0, 1.0) * uLightColor;
 
-  // specular lighting 
+  // specular 
   vec3 viewDir = normalize(vWorldPosition - vec3(vWorldPosition));
   vec3 lightInv = -lightDirection;
   vec3 reflectDir = reflect(lightInv, normal);
   float specularStrength = 0.8;
   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
-    vec3 specular = specularStrength * spec * uLightColor;  
+  vec3 specular = specularStrength * spec * uLightColor;  
   addedLights.rgb += specular;
 
   // gl_FragColor = vec4(0.5,0.5,0.5,1.0);
