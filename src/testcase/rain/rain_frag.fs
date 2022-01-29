@@ -5,6 +5,7 @@ varying vec3 vViewPosition;
 
 uniform sampler2D uFloorDiffuse;
 uniform sampler2D uFloorNormal;
+uniform sampler2D uRainNormal;
 uniform float uTime;
 uniform vec3 uLightColor;
 uniform vec3 uLightPosition;
@@ -25,9 +26,16 @@ mat3 tangentTransform(vec3 vViewPosition) {
   return tbn;
 }
 
+float flip(float x, float time, float division, float speed){
+  return x + mod(floor(time * speed), division) * 1.0 / division;
+}
+
 void main() {
   vec4 diffuse = texture2D(uFloorDiffuse, vUv);
   vec3 normal = texture2D(uFloorNormal, vUv).xyz;
+  vec3 rainNormal = texture2D(uRainNormal, vec2(flip(vUv.x, uTime, 4.0, 6.0), vUv.y)).xyz;
+  // rainNormal.xyz += sin(uTime);
+  normal = mix(normal, rainNormal, 0.5);
   normal = normal * 2.0 - 1.0;
 
   mat3 tbn = tangentTransform(vViewPosition);
@@ -47,10 +55,13 @@ void main() {
   vec3 specular = specularStrength * spec * uLightColor;  
   addedLights.rgb += specular;
 
+  // vec3 rainNormal = texture2D(uRainNormal, vUv).xyz;
+  // addedLights.rgb += rainNormal;
+
   // gl_FragColor = vec4(0.5,0.5,0.5,1.0);
   // gl_FragColor = vec4(uLightPosition / length(uLightPosition), 1.0);
   // gl_FragColor = diffuse;
-  // gl_FragColor =  vec4(normal,1.0);
+  // gl_FragColor = vec4(normal,1.0);
   // gl_FragColor = addedLights;
   gl_FragColor = mix(vec4(diffuse.x, diffuse.y, diffuse.z, 1.0), addedLights, 0.5);
 }

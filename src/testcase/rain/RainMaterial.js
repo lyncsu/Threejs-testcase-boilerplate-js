@@ -9,6 +9,7 @@ export class RainMaterial extends ShaderMaterial {
         uTime: { value: 1.0 },
         uFloorDiffuse: { value: params.floorDiffuse },
         uFloorNormal: { value: params.floorNormal },
+        uRainNormal: { value: params.rainNormal },
         transform: {
           type: 'm4',
           value: new Matrix4(),

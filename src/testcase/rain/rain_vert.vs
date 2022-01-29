@@ -3,15 +3,16 @@ varying vec3 vViewPosition;
 varying vec3 vWorldPosition;
 varying vec3 vNormal;
 varying vec3 viewPos;
+// no use identity matrix
 uniform mat4 transform; 
 
 void main() {
   vUv = uv;
   vNormal = normal;
-  vec4 mvPosition =  viewMatrix * transform * modelMatrix * vec4(position, 1.0);
-  vWorldPosition = mvPosition.xyz;
+  vec4 modelViewPosition =  viewMatrix * transform * modelMatrix * vec4(position, 1.0);
+  vWorldPosition = modelViewPosition.xyz;
   vViewPosition = -vWorldPosition;
   vNormal = normalize(normalMatrix *  normal);
 
-  gl_Position = projectionMatrix * mvPosition;
+  gl_Position = projectionMatrix * modelViewPosition;
 }
