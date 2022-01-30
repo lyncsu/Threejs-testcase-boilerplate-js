@@ -31,7 +31,7 @@ export class App {
 
   initCamera() {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000)
-    this.camera.position.set(15, 15, 15)
+    this.camera.position.set(10, 10, 10)
   }
 
   initEventListener() {
@@ -49,8 +49,8 @@ export class App {
     const ambient = new THREE.AmbientLight(0xffffff, 0.75)
     this.scene.add(ambient)
 
-    const grid = new THREE.GridHelper(15, 30)
-    this.scene.add(grid)
+    // const grid = new THREE.GridHelper(15, 30)
+    // this.scene.add(grid)
   }
 
   initRenderer() {

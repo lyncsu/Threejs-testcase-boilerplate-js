@@ -9,7 +9,11 @@ export class RainMaterial extends ShaderMaterial {
         uTime: { value: 1.0 },
         uFloorDiffuse: { value: params.floorDiffuse },
         uFloorNormal: { value: params.floorNormal },
-        uRainNormal: { value: params.rainNormal },
+        uRippleNormal: { value: params.rippleNormal },
+        uResolution: { value: params.resolution },
+        uLightColor: { value: params.light.color },
+        uLightPosition: { value: params.light.position },
+        // for three internal use
         transform: {
           type: 'm4',
           value: new Matrix4(),
@@ -18,8 +22,6 @@ export class RainMaterial extends ShaderMaterial {
           type: 'm3',
           value: new Matrix3(),
         },
-        uLightColor: { value: params.light.color },
-        uLightPosition: { value: params.light.position },
       },
       vertexShader: VertexShader,
       fragmentShader: FragmentShader,
