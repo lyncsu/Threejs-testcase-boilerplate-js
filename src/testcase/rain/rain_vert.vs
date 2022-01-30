@@ -2,7 +2,6 @@ varying vec2 vUv;
 varying vec3 vViewPosition;
 varying vec3 vWorldPosition;
 varying vec3 vNormal;
-varying vec3 viewPos;
 // no use identity matrix
 uniform mat4 transform; 
 

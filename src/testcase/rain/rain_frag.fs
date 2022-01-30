@@ -15,8 +15,8 @@ mat3 tangentTransform(vec3 vViewPosition) {
   // normal mapping
   vec4 posAndU = vec4(-vViewPosition, vUv.x);
   // tangent is alongside the u-axis(x-axis, horizontal one.)
-  vec4 posAndU_dx = dFdx(posAndU),  posAndU_dy = dFdy(posAndU);
-  vec3 tangent = posAndU_dx.w * posAndU_dx.xyz + posAndU_dy.w * posAndU_dy.xyz;
+  vec4 dx = dFdx(posAndU), dy = dFdy(posAndU);
+  vec3 tangent = dx.w * dx.xyz + dy.w * dy.xyz;
   vec3 normal = normalize(vNormal);
   vec3 binormal = normalize(cross(tangent, normal));
   // no normalization required
@@ -26,27 +26,33 @@ mat3 tangentTransform(vec3 vViewPosition) {
   return tbn;
 }
 
-float flip(float x, float time, float division, float speed){
-  return x + mod(floor(time * speed), division) * 1.0 / division;
+vec2 flip(vec2 uv, int division, int tiling, float time){
+  float fDivision = float(division);
+  float fTiling = float(tiling);
+  vec2 delta = vec2(floor(time), floor(time / fDivision));
+  vec2 offset = mod(delta, fDivision);
+  
+  return vec2(uv + offset / fTiling) / fDivision * fTiling;
 }
 
 void main() {
   vec4 diffuse = texture2D(uFloorDiffuse, vUv);
   vec3 normal = texture2D(uFloorNormal, vUv).xyz;
-  vec3 rainNormal = texture2D(uRainNormal, vec2(flip(vUv.x, uTime, 4.0, 6.0), vUv.y)).xyz;
-  // rainNormal.xyz += sin(uTime);
+  vec3 rainNormal = texture2D(uRainNormal, flip(vUv, 4, 2, uTime * 8.0)).xyz;
+  
   normal = mix(normal, rainNormal, 0.5);
   normal = normal * 2.0 - 1.0;
 
   mat3 tbn = tangentTransform(vViewPosition);
   normal = normalize(tbn * normal);
 
-  vec4 addedLights = vec4(0.0,0.0,0.0, 1.0);
+  // todo: multi lights 
+  vec4 addedLights = vec4(0.0, 0.0, 0.0, 1.0);
   vec3 lightDirection = normalize(uLightPosition - vWorldPosition);
-  // diffuse
+  // light diffuse
   addedLights.rgb += clamp(dot(lightDirection, normal), 0.0, 1.0) * uLightColor;
 
-  // specular 
+  // specular
   vec3 viewDir = normalize(vWorldPosition - vec3(vWorldPosition));
   vec3 lightInv = -lightDirection;
   vec3 reflectDir = reflect(lightInv, normal);
@@ -55,9 +61,7 @@ void main() {
   vec3 specular = specularStrength * spec * uLightColor;  
   addedLights.rgb += specular;
 
-  // vec3 rainNormal = texture2D(uRainNormal, vUv).xyz;
-  // addedLights.rgb += rainNormal;
-
+  // Debug
   // gl_FragColor = vec4(0.5,0.5,0.5,1.0);
   // gl_FragColor = vec4(uLightPosition / length(uLightPosition), 1.0);
   // gl_FragColor = diffuse;
