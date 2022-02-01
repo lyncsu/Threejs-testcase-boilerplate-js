@@ -4,7 +4,12 @@ import FragmentShader from './drop_frag.fs'
 
 export class RainDropMaterial extends MeshStandardMaterial {
   constructor(params) {
-    super({ normalMap: params.normalMap, normalScale: params.normalScale })
+    super({
+      normalMap: params.normalMap,
+      envMap: params.envMap,
+      metalness: 1,
+      roughness: 0.1,
+    })
 
     const scope = this
 

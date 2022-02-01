@@ -10,7 +10,6 @@ saturateM.b *= fract(textureN.b - 0.2 * uTime);
 float staticM = -1.0 * mapM.r;
 mapN = vec3(mapN.rg * (saturateM.b + staticM), 1.0);
 
-// mapN *= step(-vViewPosition.y, 200.);
-// mapN = 
-mapN.xy *= normalScale * smoothstep(vUv.y, 0.0, 0.35);
+float maskY = clamp(smoothstep(vUv.y, 0.0, 0.45) * 5.0, .0, 1.0);
+mapN.xy *= normalScale * maskY;
 normal = normalize( vTBN * mapN );

@@ -46,12 +46,12 @@ export class RainDemo extends Demo {
 
     // drop
     // const dropGeometry = new THREE.BoxBufferGeometry(3, 3, 3)
-    const dropGeometry = new THREE.SphereBufferGeometry(2.5, 32, 32)
+    const dropGeometry = new THREE.SphereBufferGeometry(2.0, 32, 32)
     const dropNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drop_normal.png`)
     const dropMask = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drop_mask.png`)
     dropNormal.wrapS = dropNormal.wrapT = dropMask.wrapS = dropMask.wrapT = THREE.RepeatWrapping
 
-    this.dropMaterial = new RainDropMaterial({ normalMap: dropNormal, normalMaskMap: dropMask, normalScale: new THREE.Vector2(1.0, 1.0) })
+    this.dropMaterial = new RainDropMaterial({ normalMap: dropNormal, normalMaskMap: dropMask, envMap: this.app.textureCube })
     this.dropMaterial.userData.uTime = { value: 1 }
     this.dropMaterial.needsUpdate = true
     const cube = new THREE.Mesh(dropGeometry, this.dropMaterial)

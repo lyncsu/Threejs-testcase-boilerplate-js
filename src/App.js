@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { Testcase } from './testcase/Testcase'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { Constant } from './Constant'
 
 export class App {
   constructor(domElement) {
@@ -40,6 +41,13 @@ export class App {
 
   initScene() {
     this.scene = new THREE.Scene()
+
+    const cubeLoader = new THREE.CubeTextureLoader()
+    cubeLoader.setPath(`${Constant.STATIC_ASSETS_PATH}env/`)
+    const textureCube = cubeLoader.load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'])
+    textureCube.encoding = THREE.sRGBEncoding
+    this.textureCube = textureCube
+    this.scene.background = textureCube
 
     // const directional = new THREE.DirectionalLight(0xffffff, 0.15)
     // directional.position.set(0, 300, -2000)
