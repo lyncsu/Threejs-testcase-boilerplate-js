@@ -79,7 +79,7 @@ float voronoi(){
       featurePosition = 0.5 + 0.5 * sin(uTime * 1.0 + 2.0 * PI * featurePosition);
       
       vec2 diff = neighbor + featurePosition - fractionPosition;
-      minDistance = min(minDistance, length(diff) * 2.2);
+      minDistance = min(minDistance, length(diff) * 1.8);
     }
   }
 
@@ -93,10 +93,11 @@ void main() {
   vec3 ripple2Normal = texture2D(uRippleNormal, flip(vUv, 4, 2, uTime * 10.0, vec2(0.35))).xyz;
   
   float mask = voronoi();
-  vec3 rippleFinal = mix(ripple2Normal * 20.0, rippleNormal * 3.0 , mask);
-  // vec3 rippleFinal = blend(vec4(rippleNormal, 1.0), vec4(ripple2Normal, 1.0), mask);
-  // normal = blend(vec4(normal, 1.0), vec4(rippleFinal * 0.7, 1.0));
-  normal = mix(normal * 0.9, rippleFinal * 1.0, 1.0 - mask * 0.92);
+  vec3 rippleFinal = mix(ripple2Normal, rippleNormal, mask);
+  normal= normal * 2.0 - 1.0;
+  // normal = mix(normal, rippleFinal, 1.0 - mask);
+  normal = blend(vec4(normal, 1.0), vec4(rippleFinal * 0.65, 1.0));
+  // normal = mix(normal, rippleFinal, 0.1);
 
   mat3 tbn = tangentTransform(vViewPosition);
   normal = normalize(tbn * normal);
@@ -113,17 +114,18 @@ void main() {
   vec3 viewDir = normalize(vWorldPosition - vec3(vWorldPosition));
   vec3 lightInv = -lightDirection;
   vec3 reflectDir = reflect(lightInv, normal);
-  float specularStrength = 0.9;
+  float specularStrength = 0.8;
   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 8.0);
   vec3 specular = specularStrength * spec * uLightColor;  
   addedLights.rgb += specular;
 
   // Debug
+  gl_FragColor = mix(vec4(vec3(diffuse), 1.0), addedLights, 0.5);
   // gl_FragColor = vec4(0.5,0.5,0.5,1.0);
   // gl_FragColor = vec4(uLightPosition / length(uLightPosition), 1.0);
   // gl_FragColor = diffuse;
-  gl_FragColor = vec4(rippleFinal, 1.0);
+  // gl_FragColor = vec4(rippleFinal, 1.0);
   // gl_FragColor = addedLights;
   // gl_FragColor = vec4(vec3(mask), 1.0);
-  gl_FragColor = mix(vec4(vec3(diffuse), 1.0), addedLights, 0.5);
+  
 }
