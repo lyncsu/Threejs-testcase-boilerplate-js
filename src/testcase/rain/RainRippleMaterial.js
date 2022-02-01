@@ -1,8 +1,8 @@
-import { Matrix3, Matrix4, RepeatWrapping, ShaderMaterial, UniformsLib, UniformsUtils, Vector3 } from 'three'
-import VertexShader from './rain_vert.vs'
-import FragmentShader from './rain_frag.fs'
+import { Matrix3, Matrix4, ShaderMaterial } from 'three'
+import VertexShader from './ripple_vert.vs'
+import FragmentShader from './ripple_frag.fs'
 
-export class RainMaterial extends ShaderMaterial {
+export class RainRippleMaterial extends ShaderMaterial {
   constructor(params) {
     super({
       uniforms: {

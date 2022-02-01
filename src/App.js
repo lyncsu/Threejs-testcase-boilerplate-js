@@ -46,7 +46,7 @@ export class App {
     // this.app.scene.add(directional)
     // directional.target = this.app.scene
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.75)
+    const ambient = new THREE.AmbientLight(0xeeeeee, 0.75)
     this.scene.add(ambient)
 
     // const grid = new THREE.GridHelper(15, 30)
