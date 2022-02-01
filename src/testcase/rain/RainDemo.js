@@ -24,7 +24,7 @@ export class RainDemo extends Demo {
   async init() {
     const resolution = new THREE.Vector2(this.app.domElement.clientWidth, this.app.domElement.clientHeight)
     const lightPosition = new THREE.Vector3(15, 2.5, 5)
-    const light = new THREE.PointLight(0x666666, 0.5)
+    const light = new THREE.PointLight(0x684b7c, 0.5)
     light.position.copy(lightPosition)
     this.app.scene.add(light)
     this.light = light

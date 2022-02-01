@@ -7,7 +7,8 @@ export class RainDropMaterial extends MeshStandardMaterial {
     super({
       normalMap: params.normalMap,
       envMap: params.envMap,
-      metalness: 1,
+      color: 0xf0dbff,
+      metalness: 0.96,
       roughness: 0.1,
     })
 

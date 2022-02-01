@@ -108,7 +108,7 @@ void main() {
   vec4 addedLights = vec4(0.0, 0.0, 0.0, 1.0);
   vec3 lightDirection = normalize(uLightPosition - vWorldPosition);
   // light on diffuse
-  addedLights.rgb += clamp(dot(lightDirection, normal), 0.0, 1.0) * uLightColor;
+  addedLights.rgb += clamp(dot(lightDirection, normal), 0.0, 1.0) * uLightColor * 1.7;
 
   // specular
   vec3 viewDir = normalize(vWorldPosition - vec3(vWorldPosition));

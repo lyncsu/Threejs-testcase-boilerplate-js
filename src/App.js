@@ -44,7 +44,7 @@ export class App {
 
     const cubeLoader = new THREE.CubeTextureLoader()
     cubeLoader.setPath(`${Constant.STATIC_ASSETS_PATH}env/`)
-    const textureCube = cubeLoader.load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'])
+    const textureCube = cubeLoader.load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'])
     textureCube.encoding = THREE.sRGBEncoding
     this.textureCube = textureCube
     this.scene.background = textureCube
