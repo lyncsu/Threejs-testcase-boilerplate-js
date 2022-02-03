@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { Testcase } from './testcase/Testcase'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Constant } from './Constant'
+import Stats from 'three/examples/jsm/libs/stats.module.js'
 
 export class App {
   constructor(domElement) {
@@ -28,6 +29,7 @@ export class App {
     this.initRenderer()
     this.intTestcase()
     this.initOrbit()
+    this.initStats()
   }
 
   initCamera() {
@@ -78,9 +80,15 @@ export class App {
     new OrbitControls(this.camera, this.domElement)
   }
 
+  initStats() {
+    this.stats = new Stats()
+    this.domElement.appendChild(this.stats.dom)
+  }
+
   render() {
     this.renderer.render(this.scene, this.camera)
     if (this.testcase) this.testcase.update()
+    if (this.stats) this.stats.update()
   }
 
   resize() {
