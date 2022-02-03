@@ -3,19 +3,13 @@ vec3 mapM = vec3(textureM * 2.0 - 1.0);
 vec3 textureN = texture2D(normalMap, vUv * 4.0).xyz; 
 vec3 mapN = vec3(textureN.rg * 2.0 - 1.0, 1.0);
 
-// saturate
 vec3 saturateM = clamp(mapM, 0.0, 1.0);
 saturateM.b *= fract(textureN.b - 0.2 * uTime);
 float staticM = -1.0 * mapM.r;
 vec3 drop = vec3(mapN.rg * (saturateM.b + staticM), 1.0);
 
 float maskY = clamp(smoothstep(vUv.y, 0.0, 0.36) * 5.0, .0, 1.0);
-// mapN.xy *= normalScale * maskY;
-
 vec3 textureDripNormal = texture2D(dripNormal, vUv).xyz;
-// vec3 mapN = vec3(textureDripNormal.r, 1.0, textureDripNormal.b);
-// mapN.xy *= normalScale;
-// normal = normalize( vTBN * mapN );
 // vec2 tUv = (vTexCoords.xy / vTexCoords.w) * 0.5 + 0.5;
 vec3 textureDripGray = texture2D(dripGray, vUv).xyz;
 float mixB = mix(0.15, 0.5, textureDripGray.r);
