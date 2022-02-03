@@ -49,15 +49,43 @@ export class RainDemo extends Demo {
     const dropGeometry = new THREE.SphereBufferGeometry(2.0, 32, 32)
     const dropNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drop_normal.png`)
     const dropMask = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drop_mask.png`)
-    dropNormal.wrapS = dropNormal.wrapT = dropMask.wrapS = dropMask.wrapT = THREE.RepeatWrapping
+    const dripNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drip_normal.png`)
+    const dripMask = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drip_mask.png`)
+    const dripGray = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drip_grayscale.png`)
+    dropNormal.wrapS = dropNormal.wrapT = dripNormal.wrapS = dripNormal.wrapT = THREE.RepeatWrapping
+    dropMask.wrapS = dropMask.wrapT = dripMask.wrapS = dripMask.wrapT = THREE.RepeatWrapping
 
-    this.dropMaterial = new RainDropMaterial({ normalMap: dropNormal, normalMaskMap: dropMask, envMap: this.app.textureCube })
-    this.dropMaterial.userData.uTime = { value: 1 }
-    this.dropMaterial.needsUpdate = true
+    this.dropMaterial = new RainDropMaterial({
+      envMap: this.app.textureCube,
+      normalMap: dropNormal,
+      dropMask,
+      dripNormal,
+      dripMask,
+      dripGray,
+    })
+
     const cube = new THREE.Mesh(dropGeometry, this.dropMaterial)
     cube.geometry.computeTangents()
     cube.position.y = 2.7
+    cube.updateMatrixWorld()
     this.app.scene.add(cube)
+    this.cube = cube
+
+    // this.app.camera.updateProjectionMatrix()
+    // this.app.camera.updateMatrixWorld()
+    // this.app.camera.updateWorldMatrix()
+
+    // const viewMatrixCamera = this.app.camera.matrixWorldInverse
+    // const projectionMatrixCamera = this.app.camera.projectionMatrix
+    // const modelMatrixCamera = this.app.camera.matrixWorld
+
+    this.dropMaterial.userData.uTime = { value: 1 }
+    // this.dropMaterial.userData.viewMatrixCamera = { type: 'm4', value: viewMatrixCamera }
+    // this.dropMaterial.userData.projectionMatrixCamera = { type: 'm4', value: projectionMatrixCamera }
+    // this.dropMaterial.userData.modelMatrixCamera = { type: 'mat4', value: modelMatrixCamera }
+    // this.dropMaterial.userData.savedModelMatrix = { type: 'mat4', value: cube.matrixWorld }
+    // this.dropMaterial.userData.projectionPosition = { type: 'v3', value: this.app.camera.position }
+    this.dropMaterial.needsUpdate = true
   }
 
   update() {
@@ -65,6 +93,7 @@ export class RainDemo extends Demo {
     this.light.position.x = 5 + Math.sin(time) * 3
     this.light.position.y = 5 + Math.sin(time * 0.5) * 5
     this.light.position.z = 3 + Math.cos(time) * 10
+
     if (this.rippleMaterial) {
       this.rippleMaterial.uniforms.uTime.value = time
       this.rippleMaterial.uniforms.uLightPosition.value = this.light.position
@@ -72,6 +101,28 @@ export class RainDemo extends Demo {
 
     if (this.dropMaterial) {
       this.dropMaterial.userData.uTime.value = time
+      // this.updateCameraMatrices()
     }
+  }
+
+  updateCameraMatrices() {
+    // make sure the camera matrices are updated
+    this.app.camera.updateProjectionMatrix()
+    this.app.camera.updateMatrixWorld()
+    this.app.camera.updateWorldMatrix()
+
+    // update the uniforms from the camera so they're
+    const viewMatrixCamera = this.app.camera.matrixWorldInverse
+    const projectionMatrixCamera = this.app.camera.projectionMatrix
+
+    this.dropMaterial.userData.viewMatrixCamera.value.copy(viewMatrixCamera)
+    this.dropMaterial.userData.projectionMatrixCamera.value.copy(projectionMatrixCamera)
+    this.dropMaterial.userData.projectionPosition.value.copy(this.app.camera.position)
+    this.cube.updateMatrixWorld()
+    this.dropMaterial.userData.savedModelMatrix.value.copy(this.cube.matrixWorld)
+    // this.dropMaterial.userData.projectionDirection.value.set(0, 0, 1).applyMatrix4(modelMatrixCamera)
+    // console.info(this.dropMaterial.userData.projectionPosition.value)
+    // tell the shader we've projected
+    // this.uniforms.isTextureProjected.value = true
   }
 }
