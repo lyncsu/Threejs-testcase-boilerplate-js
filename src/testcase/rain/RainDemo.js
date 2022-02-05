@@ -46,7 +46,7 @@ export class RainDemo extends Demo {
 
     // drop
     // const dropGeometry = new THREE.BoxBufferGeometry(3, 3, 3)
-    const dropGeometry = new THREE.SphereBufferGeometry(2.0, 32, 32)
+    const dropGeometry = new THREE.SphereBufferGeometry(2.5, 32, 32)
     const dropNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drop_normal.png`)
     const dropMask = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drop_mask.png`)
     const dripNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}drip_normal.png`)
@@ -66,7 +66,7 @@ export class RainDemo extends Demo {
 
     const cube = new THREE.Mesh(dropGeometry, this.dropMaterial)
     cube.geometry.computeTangents()
-    cube.position.y = 2.7
+    cube.position.y = 2.5
     cube.updateMatrixWorld()
     this.app.scene.add(cube)
     this.cube = cube

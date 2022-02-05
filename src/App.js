@@ -3,6 +3,7 @@ import { Testcase } from './testcase/Testcase'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Constant } from './Constant'
 import Stats from 'three/examples/jsm/libs/stats.module.js'
+import { Composer } from './postprocessing/Composer'
 
 export class App {
   constructor(domElement) {
@@ -27,6 +28,7 @@ export class App {
     this.initScene()
     this.initCamera()
     this.initRenderer()
+    this.initComposer()
     this.intTestcase()
     this.initOrbit()
     this.initStats()
@@ -72,6 +74,10 @@ export class App {
     this.domElement.appendChild(this.renderer.domElement)
   }
 
+  initComposer() {
+    this.composer = new Composer(this)
+  }
+
   intTestcase() {
     this.testcase = new Testcase(this)
   }
@@ -86,7 +92,8 @@ export class App {
   }
 
   render() {
-    this.renderer.render(this.scene, this.camera)
+    // this.renderer.render(this.scene, this.camera)
+    if (this.composer) this.composer.render()
     if (this.testcase) this.testcase.update()
     if (this.stats) this.stats.update()
   }
@@ -103,7 +110,6 @@ export class App {
     }
 
     this.render()
-    console.info('resize')
   }
 
   animate() {
