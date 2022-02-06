@@ -28,6 +28,5 @@ export class RainGlassPass extends Pass {
     this.material = new RainGlassMaterial({
       resolution: new THREE.Vector2(this.app.domElement.clientWidth, this.app.domElement.clientHeight),
     })
-    console.info(this.material)
   }
 }
