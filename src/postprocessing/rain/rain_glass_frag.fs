@@ -116,7 +116,7 @@ void main() {
     
     // Drop shape and fading
     float t = (s.x + s.y * clamp(mask, 0.8, 1.0)) * max(0., 1. - fract(0.2 * uTime * (d.b + .1) + d.g) * 2.);
-    float t2 = (s2.x + s2.y) * max(0., 1. - fract(0.4 * uTime * (d2.b + .1) + d2.g) * 2.);
+    float t2 = (s2.x + s2.y * rand(vec2(1.0, 1.0)).y) * max(0., 1. - fract(0.4 * uTime * (d2.b + .1) + d2.g) * 2.);
     
     vec4 bigLayer, smallLayer;
     // d.r -> only x% of drops are kept on, with x depending on the size of drops
