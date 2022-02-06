@@ -31,6 +31,7 @@ export class App {
     this.initComposer()
     this.intTestcase()
     this.initOrbit()
+    this.initClock()
     this.initStats()
   }
 
@@ -84,6 +85,10 @@ export class App {
 
   initOrbit() {
     new OrbitControls(this.camera, this.domElement)
+  }
+
+  initClock() {
+    this.clock = new THREE.Clock()
   }
 
   initStats() {

@@ -89,7 +89,7 @@ export class RainDemo extends Demo {
   }
 
   update() {
-    const time = this.clock.getElapsedTime()
+    const time = this.app.clock.getElapsedTime()
     this.light.position.x = 5 + Math.sin(time) * 3
     this.light.position.y = 5 + Math.sin(time * 0.5) * 5
     this.light.position.z = 3 + Math.cos(time) * 10

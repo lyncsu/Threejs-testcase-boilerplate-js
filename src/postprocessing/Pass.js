@@ -90,8 +90,8 @@ export class Pass {
 
     // 交换rt
     const temp = this.renderTarget
-    this.renderTarget = this._swapRenderTarget
-    this._swapRenderTarget = temp
+    this.renderTarget = this.swapRenderTarget
+    this.swapRenderTarget = temp
 
     writeBuffer = renderToScreen ? null : writeBuffer || this.renderTarget
 
@@ -111,5 +111,13 @@ export class Pass {
 
   onWindowResize() {
     this.resize(this.app.domElement.clientWidth, this.app.domElement.clientHeight)
+  }
+
+  resize(width, height) {
+    const pixelRatio = this.renderer.getPixelRatio()
+    this.renderTarget.setSize(width * pixelRatio, height * pixelRatio)
+    this.swapRenderTarget.setSize(width * pixelRatio, height * pixelRatio)
+    this.width = width
+    this.height = height
   }
 }
