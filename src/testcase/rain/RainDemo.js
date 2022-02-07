@@ -90,7 +90,7 @@ export class RainDemo extends Demo {
     this.dropMaterial.needsUpdate = true
 
     // fall effect
-    this.fallAmount = 400
+    this.fallAmount = 500
     const fallAlpha = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}fall_alpha.png`)
     // const fallNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}fall_normal.png`)
     fallAlpha.wrapS = fallAlpha.wrapT = THREE.RepeatWrapping
@@ -155,7 +155,7 @@ export class RainDemo extends Demo {
   updateRainFall() {
     const time = this.app.clock.getElapsedTime()
     const amount = this.fallAmount
-    const speed = 22
+    const speed = 13
     const dummy = new THREE.Object3D()
     const bounding = new THREE.Vector2(0, 50)
 
