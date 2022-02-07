@@ -6,7 +6,7 @@ export class RainFallMaterial extends MeshStandardMaterial {
       alphaMap: param.alphaMap,
       envMap: param.envMap,
       // normalMap: param.normalMap,
-      metalness: 0.7,
+      metalness: 0.9,
       roughness: 0.1,
       transparent: true,
       side: DoubleSide,

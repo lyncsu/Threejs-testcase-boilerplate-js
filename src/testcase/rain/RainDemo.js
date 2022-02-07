@@ -90,7 +90,7 @@ export class RainDemo extends Demo {
     this.dropMaterial.needsUpdate = true
 
     // fall effect
-    this.fallAmount = 50
+    this.fallAmount = 400
     const fallAlpha = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}fall_alpha.png`)
     // const fallNormal = await loader.loadAsync(`${Constant.STATIC_ASSETS_PATH}fall_normal.png`)
     fallAlpha.wrapS = fallAlpha.wrapT = THREE.RepeatWrapping
@@ -106,8 +106,8 @@ export class RainDemo extends Demo {
     for (let i = 0; i < this.fallAmount; i++) {
       const scaleSeed = 0.2 + Math.random() * 0.8
       this.rainFallParam.push({
-        position: new Vector3(fallRange * (-1 + Math.random() * 2), Math.random() * 100, fallRange * (-1 + Math.random() * 2)),
-        scale: new Vector2((0.18 / scaleSeed) * Math.random(), scaleSeed),
+        position: new Vector3(fallRange * (-1 + Math.random() * 2), Math.random() * 50, fallRange * (-1 + Math.random() * 2)),
+        scale: new Vector2((0.15 / scaleSeed) * Math.random(), scaleSeed),
       })
     }
     this.app.scene.add(rainFall)
@@ -164,7 +164,7 @@ export class RainDemo extends Demo {
       dummy.position.z = this.rainFallParam[i].position.z
       dummy.scale.x = dummy.scale.z = this.rainFallParam[i].scale.x
       dummy.scale.y = this.rainFallParam[i].scale.y
-      dummy.position.y = this.clamp(-time * speed * (0.8 + dummy.scale.y), bounding)
+      dummy.position.y = this.clamp(-time * speed * (0.8 + dummy.scale.y) + this.rainFallParam[i].position.y, bounding)
       dummy.updateMatrix()
 
       this.rainFall.setMatrixAt(i++, dummy.matrix)
