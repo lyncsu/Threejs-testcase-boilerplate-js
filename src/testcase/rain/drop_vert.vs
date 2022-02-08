@@ -13,8 +13,8 @@
 //   vec4 modelViewPosition = viewMatrix * transform * modelMatrix * vec4(position, 1.0);
   
   // vNormal = mat3(savedModelMatrix) * normal;
-  vWorldPosition = viewMatrix * modelMatrix * vec4(position, 1.0);
+  // vWorldPosition = viewMatrix * modelMatrix * vec4(position, 1.0);
   // vTexCoords = viewMatrixCamera * vWorldPosition;
-  vTexCoords = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+  // vTexCoords = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
 //   gl_Position = projectionMatrix * modelViewPosition;
 // }

@@ -3,9 +3,9 @@ uniform sampler2D dropMask;
 uniform sampler2D dripNormal;
 uniform sampler2D dripMask;
 uniform sampler2D dripGray;
-varying vec4 vWorldPosition;
-varying vec4 vTexCoords;
-uniform vec3 projectionPosition;
+// varying vec4 vWorldPosition;
+// varying vec4 vTexCoords;
+// uniform vec3 projectionPosition;
 
 uvec3 k = uvec3(0x456789abu, 0x6789ab45u, 0x89ab4567u);
 const uint max32 = 0xffffffffu;
