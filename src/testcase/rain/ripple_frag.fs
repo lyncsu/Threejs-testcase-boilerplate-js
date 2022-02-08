@@ -94,7 +94,7 @@ void main() {
   
   float mask = voronoi();
   vec3 rippleFinal = mix(ripple2Normal, rippleNormal, mask);
-  normal= normal * 2.0 - 1.0;
+  normal = normal * 2.0 - 1.0;
   // normal = mix(normal, rippleFinal, 1.0 - mask);
   normal = blend(vec4(normal, 1.0), vec4(rippleFinal * 0.65, 1.0));
   // normal = mix(normal, rippleFinal, 0.1);
