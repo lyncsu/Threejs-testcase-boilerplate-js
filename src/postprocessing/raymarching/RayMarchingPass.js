@@ -41,6 +41,7 @@ export class RayMarchingPass extends Pass {
       lightColor: this.app.light.color,
       distance: 50,
       precision: 0.01,
+      envMap: this.app.textureCube,
     })
   }
 }

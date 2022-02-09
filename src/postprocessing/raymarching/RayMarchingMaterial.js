@@ -19,6 +19,7 @@ export class RayMarchingMaterial extends ShaderMaterial {
         // target: { value: this.target },
         uRaymarchMaximumDistance: { value: param.distance },
         uRaymarchPrecision: { value: param.precision },
+        uEnvMap: { value: param.envMap },
       },
       // vertexShader: VertexShader.trim(),
       fragmentShader: FragmentShader.trim(),

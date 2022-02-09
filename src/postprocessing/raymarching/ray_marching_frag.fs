@@ -7,6 +7,7 @@
 uniform float uTime;
 uniform vec2 uResolution;
 uniform sampler2D uSceneMap;
+uniform samplerCube uEnvMap;
 uniform vec3 uCameraPosition;
 uniform vec3 uCameraTarget;
 uniform float uFov;
@@ -94,12 +95,13 @@ vec2 sdf(vec3 position){
   vec4 quaternion = vec4(1.0, sin(uTime) * 0.1, 0.0, uTime * 0.2);
   // noise
   vec3 noise = position * 0.25;
-  //noise += time * .1;
+  // noise += time * .1;
   float pnoise = 1.0 + perlin(noise);
-  vec2 box = roundBox(position, vec3(7.5, 0.15, 0.15), 0.5, zero, quaternion + vec4(1.0, 1.0, 1.0, PI / 4.0));
+  vec2 box = roundBox(position, vec3(7.2, 0.05, 0.05), 0.5, zero, quaternion + vec4(1.0, 1.0, 1.0, PI / 4.0));
+  // vec2 box2 = roundBox(position, vec3(7.2, 0.05, 0.05), 0.5, zero, quaternion + vec4(1.0, 1.0, 1.0, -PI / 4.0));
   vec2 sph = sphere(position, 7.0, zero, quaternion);
-  vec2 sph2 = sphere(position, 2.0, zero + 5.0 * sin(uTime), quaternion );// + perlin( position + uTime ) * 0.12;
-  vec2 sph3 = sphere(position, 3.0, zero + 5.0 * cos(uTime), quaternion );// + perlin( position + uTime ) * 0.15;
+  vec2 sph2 = sphere(position, 2.0, zero + 5.0 * sin(uTime), quaternion);// + perlin( position + uTime ) * 0.12;
+  vec2 sph3 = sphere(position, 3.0, zero + 3.0 * cos(uTime), quaternion);// + perlin( position + uTime ) * 0.15;
 
   return smin(sph3, smin(sph2, smin(sph, box, pnoise), pnoise), pnoise);
 }
@@ -146,21 +148,35 @@ void main() {
   vec2 screenPos = 2.0 * uv - 1.0;
   screenPos.x *= uResolution.x / uResolution.y;
   vec3 rayDirection = getRay(uCameraPosition, uCameraTarget, screenPos, uFov);
+  
+  vec3 outColor = texture2D(uSceneMap, uv).xyz;
   vec2 intersectPoint = raymarching(uCameraPosition, rayDirection, uRaymarchMaximumDistance, uRaymarchPrecision);
   if (intersectPoint.x > -0.5){
     // world position
-    vec3 pos = uCameraPosition + rayDirection * intersectPoint.x;
+    vec3 position = uCameraPosition + rayDirection * intersectPoint.x;
     // diffuse color
     vec3 color = vec3(intersectPoint.y);
     // normal vector
-    vec3 normal = calNormal(pos);
+    vec3 normal = calNormal(position);
     vec3 light = normalize(uLightPosition);
     vec3 lightColor = max(0.0, dot(light, normal)) * uLightColor;
-    vec3 diffuse = vec3(1.0, 1.0, 1.0);
+    vec3 diffuse = vec3(0.0, 0.0, 0.0);
+
+    // float rim = pow(clamp(1.0 + dot(normal, rayDirection), 0.0, 1.0), 4.0);
+
+    vec3 reflectDirection = reflect(rayDirection, normal);
+    // // // vec2 tref = intersect(position + normal * 0.001, reflectDirection);
+    // // vec2 reflectIntersectPoint = raymarching(position + normal*0.001, reflectDirection, uRaymarchMaximumDistance, uRaymarchPrecision);
+    // // if(reflectIntersectPoint.x < 0.5){
+    // // float reflectF = 0.3 + 0.7 * pow(clamp(1.0 + dot(rayDirection, normal), 0.0, 1.0), 5.0);
+    vec3 sss = textureCube(uEnvMap, vec3(-reflectDirection.x, reflectDirection.yz)).xyz;
+    //   // outColor += 2.0 * pow(sss, vec3(4.0)) * reflectF;//* outColor.w
+    // outColor = sss;
+    // }
 
     float depth = 1.0 / log(intersectPoint.x);
-    gl_FragColor = vec4((color + lightColor + diffuse) * depth, 1.);// + lightColor1 
-  } else {
-    gl_FragColor = vec4(texture2D(uSceneMap, uv).xyz, 1.0);
+    outColor = (sss + color + lightColor + diffuse) * depth;
   }
+
+  gl_FragColor = vec4(outColor, 1.0);
 }

@@ -65,7 +65,7 @@ export class RainDemo extends Demo {
     cube.geometry.computeTangents()
     cube.position.y = 0
     cube.updateMatrixWorld()
-    this.app.scene.add(cube)
+    // this.app.scene.add(cube)
     this.cube = cube
 
     // this.app.camera.updateProjectionMatrix()
