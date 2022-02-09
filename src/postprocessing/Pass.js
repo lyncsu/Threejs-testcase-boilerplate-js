@@ -119,5 +119,6 @@ export class Pass {
     this.swapRenderTarget.setSize(width * pixelRatio, height * pixelRatio)
     this.width = width
     this.height = height
+    if (this.material.uniforms.uResolution) this.material.uniforms.uResolution.value = new THREE.Vector2(width, height)
   }
 }

@@ -26,14 +26,7 @@ export class RainDemo extends Demo {
    */
   async init() {
     const resolution = new THREE.Vector2(this.app.domElement.clientWidth, this.app.domElement.clientHeight)
-    const lightPosition = new THREE.Vector3(15, 2.5, 5)
-    const light = new THREE.PointLight(0x684b7c, 0.5)
-    light.position.copy(lightPosition)
-    this.app.scene.add(light)
-    this.light = light
-    const helper = new THREE.PointLightHelper(light, 1)
-    this.app.scene.add(helper)
-
+    const light = this.app.light
     // ripple on floor
     const geometry = new THREE.PlaneBufferGeometry(10, 10, 1, 1)
     const loader = new THREE.TextureLoader()
@@ -45,6 +38,7 @@ export class RainDemo extends Demo {
 
     const plane = new THREE.Mesh(geometry, this.rippleMaterial)
     plane.rotation.x = -Math.PI / 2
+    plane.position.y = -2.5
     this.app.scene.add(plane)
 
     // drop
@@ -69,7 +63,7 @@ export class RainDemo extends Demo {
 
     const cube = new THREE.Mesh(dropGeometry, this.dropMaterial)
     cube.geometry.computeTangents()
-    cube.position.y = 2.5
+    cube.position.y = 0
     cube.updateMatrixWorld()
     this.app.scene.add(cube)
     this.cube = cube
@@ -135,13 +129,13 @@ export class RainDemo extends Demo {
 
   update() {
     const time = this.app.clock.getElapsedTime()
-    this.light.position.x = 5 + Math.sin(time) * 3
-    this.light.position.y = 5 + Math.sin(time * 0.5) * 5
-    this.light.position.z = 3 + Math.cos(time) * 10
+    this.app.light.position.x = 5 + Math.sin(time) * 3
+    this.app.light.position.y = 5 + Math.sin(time * 0.5) * 5
+    this.app.light.position.z = 3 + Math.cos(time) * 10
 
     if (this.rippleMaterial) {
       this.rippleMaterial.uniforms.uTime.value = time
-      this.rippleMaterial.uniforms.uLightPosition.value = this.light.position
+      this.rippleMaterial.uniforms.uLightPosition.value = this.app.light.position
     }
 
     if (this.dropMaterial) {
