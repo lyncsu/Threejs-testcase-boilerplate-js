@@ -12,7 +12,7 @@ export class Composer {
 
   render() {
     this.scenePass.render()
-    this.rayMarchingPass.render(true, this.scenePass.renderTarget)
-    // this.rainGlassPass.render(true, this.rayMarchingPass.renderTarget)
+    this.rayMarchingPass.render(false, this.scenePass.renderTarget)
+    this.rainGlassPass.render(true, this.rayMarchingPass.renderTarget)
   }
 }

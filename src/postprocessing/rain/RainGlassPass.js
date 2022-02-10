@@ -11,7 +11,7 @@ export class RainGlassPass extends Pass {
 
   resolveRender(renderToScreen, readBuffer, writeBuffer) {
     readBuffer = readBuffer
-    writeBuffer = writeBuffer || renderToScreen ? null : this.renderTarget
+    writeBuffer = writeBuffer || (renderToScreen ? null : this.renderTarget)
 
     this.material.uniforms.uTime.value = this.app.clock.getElapsedTime()
     if (readBuffer) this.material.uniforms.uSceneMap.value = readBuffer.texture

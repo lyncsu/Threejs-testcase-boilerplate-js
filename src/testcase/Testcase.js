@@ -30,6 +30,6 @@ export class Testcase {
    * 更新demo
    */
   update() {
-    this.rain.update()
+    if (this.rain) this.rain.update()
   }
 }

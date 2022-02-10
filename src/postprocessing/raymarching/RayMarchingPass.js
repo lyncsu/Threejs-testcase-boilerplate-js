@@ -11,12 +11,8 @@ export class RayMarchingPass extends Pass {
 
   resolveRender(renderToScreen, readBuffer, writeBuffer) {
     readBuffer = readBuffer
-    writeBuffer = writeBuffer || renderToScreen ? null : this.renderTarget
+    writeBuffer = writeBuffer || (renderToScreen ? null : this.renderTarget)
 
-    this.material.uniforms.uRandomSeed.value = Math.random()
-    // this.material.uniforms.uFov.value = (this.app.camera.fov * Math.PI) / 180
-    // this.material.uniforms.uRaymarchMaximumDistance.value = this.distance
-    // this.material.uniforms.uRaymarchPrecision.value = this.precision
     this.material.uniforms.uCameraPosition.value = this.app.camera.position
     this.material.uniforms.uTime.value = this.app.clock.getElapsedTime()
 
@@ -31,6 +27,7 @@ export class RayMarchingPass extends Pass {
   }
 
   initMaterial() {
+    const { dropNormal, dropMask, dripNormal, dripMask, dripGray } = this.app.textures
     this.precision = 0.01
     this.material = new RayMarchingMaterial({
       resolution: new THREE.Vector2(this.app.domElement.clientWidth, this.app.domElement.clientHeight),
@@ -42,6 +39,11 @@ export class RayMarchingPass extends Pass {
       distance: 50,
       precision: 0.01,
       envMap: this.app.textureCube,
+      dropNormal,
+      dropMask,
+      dripNormal,
+      dripMask,
+      dripGray,
     })
   }
 }

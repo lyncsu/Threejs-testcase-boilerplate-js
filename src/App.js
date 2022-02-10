@@ -24,14 +24,13 @@ export class App {
     console.info('hello world')
 
     this.bindScope()
+    this.initClock()
     this.initEventListener()
     this.initScene()
     this.initCamera()
     this.initRenderer()
-    this.initComposer()
     this.intTestcase()
     this.initOrbit()
-    this.initClock()
     this.initStats()
   }
 

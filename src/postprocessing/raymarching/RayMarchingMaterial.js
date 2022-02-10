@@ -20,6 +20,12 @@ export class RayMarchingMaterial extends ShaderMaterial {
         uRaymarchMaximumDistance: { value: param.distance },
         uRaymarchPrecision: { value: param.precision },
         uEnvMap: { value: param.envMap },
+
+        uDropNormal: { value: param.dropNormal },
+        uDropMask: { value: param.dropMask },
+        uDripNormal: { value: param.dripNormal },
+        uDripMask: { value: param.dripMask },
+        uDripGray: { value: param.dripGray },
       },
       // vertexShader: VertexShader.trim(),
       fragmentShader: FragmentShader.trim(),

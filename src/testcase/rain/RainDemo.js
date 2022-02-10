@@ -52,6 +52,7 @@ export class RainDemo extends Demo {
     dropNormal.wrapS = dropNormal.wrapT = dripNormal.wrapS = dripNormal.wrapT = THREE.RepeatWrapping
     dropMask.wrapS = dropMask.wrapT = dripMask.wrapS = dripMask.wrapT = THREE.RepeatWrapping
 
+    this.app.textures = { dropNormal, dropMask, dripNormal, dripMask, dripGray }
     this.dropMaterial = new RainDropMaterial({
       envMap: this.app.textureCube,
       normalMap: dropNormal,
@@ -105,6 +106,8 @@ export class RainDemo extends Demo {
       })
     }
     this.app.scene.add(rainFall)
+    // todo
+    this.app.initComposer()
   }
 
   getRainFallGeometry() {
