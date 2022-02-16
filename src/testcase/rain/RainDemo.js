@@ -69,6 +69,8 @@ export class RainDemo extends Demo {
     // this.app.scene.add(cube)
     this.cube = cube
 
+    this.planeGeometry = new THREE.PlaneBufferGeometry()
+
     // this.app.camera.updateProjectionMatrix()
     // this.app.camera.updateMatrixWorld()
     // this.app.camera.updateWorldMatrix()
@@ -146,7 +148,13 @@ export class RainDemo extends Demo {
       // this.updateCameraMatrices()
     }
 
-    if (this.rainFall) this.updateRainFall()
+    if (this.rainFall) {
+      this.updateRainFall()
+
+      return { rainFallGeometry: this.rainFall.geometry, ballGeometry: this.planeGeometry }
+    } else {
+      return { rainFallGeometry: null, ballGeometry: null }
+    }
   }
 
   updateRainFall() {
