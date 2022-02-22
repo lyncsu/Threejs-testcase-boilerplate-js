@@ -6,13 +6,13 @@ export class Composer {
   constructor(app) {
     this.app = app
     this.scenePass = new ScenePass(app)
-    this.rayMarchingPass = new RayMarchingPass(app)
-    this.rainGlassPass = new RainGlassPass(app)
+    // this.rayMarchingPass = new RayMarchingPass(app)
+    // this.rainGlassPass = new RainGlassPass(app)
   }
 
   render() {
-    this.scenePass.render()
-    this.rayMarchingPass.render(false, this.scenePass.renderTarget)
-    this.rainGlassPass.render(true, this.rayMarchingPass.renderTarget)
+    this.scenePass.render(true)
+    // this.rayMarchingPass.render(false, this.scenePass.renderTarget)
+    // this.rainGlassPass.render(true, this.rayMarchingPass.renderTarget)
   }
 }

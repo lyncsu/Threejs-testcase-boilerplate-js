@@ -29,6 +29,7 @@ export class App {
     this.initScene()
     this.initCamera()
     this.initRenderer()
+    this.initComposer()
     this.intTestcase()
     this.initOrbit()
     this.initStats()
@@ -71,8 +72,8 @@ export class App {
     const helper = new THREE.PointLightHelper(light, 1)
     this.scene.add(helper)
 
-    // const grid = new THREE.GridHelper(15, 30)
-    // this.scene.add(grid)
+    const grid = new THREE.GridHelper(15, 30)
+    this.scene.add(grid)
   }
 
   initRenderer() {
@@ -108,7 +109,7 @@ export class App {
   render() {
     // this.renderer.render(this.scene, this.camera)
     if (this.composer) this.composer.render()
-    if (this.testcase) this.testcase.update()
+    // if (this.testcase) this.testcase.update()
     if (this.stats) this.stats.update()
   }
 

@@ -10,7 +10,7 @@ export class ScenePass extends Pass {
    * @param app
    */
   constructor(app) {
-    super(app, null, null, true, true)
+    super(app, null, null, null, true)
   }
 
   /**

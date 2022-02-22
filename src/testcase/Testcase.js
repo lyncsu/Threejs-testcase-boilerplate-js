@@ -1,14 +1,16 @@
-import { RainDemo } from './rain/RainDemo'
+// import { RainDemo } from './rain/RainDemo'
+import { DracoDemo } from './draco/DracoDemo'
 import * as dat from 'dat.gui'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
+import GeometryStats from '../util/performance/GeometryStats'
 
 /**
  * 测试用例类
  */
 export class Testcase {
   data = {
-    rainFallGPUMemory: '0 bytes',
-    ballGPUMemory: '0 bytes',
+    bunnyGPUMemory: '0 bytes',
+    totalGPUMemory: '0 bytes',
   }
 
   /**
@@ -30,13 +32,18 @@ export class Testcase {
    * 初始化
    */
   init() {
-    const gui = new dat.GUI()
-    this.rain = new RainDemo(this.app)
+    GeometryStats.registerRenderer(this.app.renderer)
+    // this.rain = new RainDemo(this.app)
+    this.draco = new DracoDemo(this.app)
 
+    // dat.gui
+    const gui = new dat.GUI()
     const folder = gui.addFolder('Memory Info')
     folder.open()
-    this.fallDisplay = folder.add(this.data, 'rainFallGPUMemory', '0 bytes')
-    this.ballDisplay = folder.add(this.data, 'ballGPUMemory', '0 bytes')
+    this.bunnyInfo = folder.add(this.data, 'bunnyGPUMemory', '0 bytes')
+    this.totalInfo = folder.add(this.data, 'totalGPUMemory', '0 bytes')
+    // this.fallDisplay = folder.add(this.data, 'rainFallGPUMemory', '0 bytes')
+    // this.ballDisplay = folder.add(this.data, 'ballGPUMemory', '0 bytes')
   }
 
   /**

@@ -93,7 +93,7 @@ export class Pass {
     this.renderTarget = this.swapRenderTarget
     this.swapRenderTarget = temp
 
-    writeBuffer = renderToScreen ? null : writeBuffer || this.renderTarget
+    writeBuffer = writeBuffer || (renderToScreen ? null : this.renderTarget)
 
     // 如果有后续处理，则执行
     if (resolveRender) {
@@ -102,7 +102,7 @@ export class Pass {
       // 如果没有后续逻辑，则直接渲染
       this.renderer.setRenderTarget(writeBuffer)
       this.renderer.render(this.postScene, this.postCamera)
-      this.renderer.setRenderTarget(null)
+      if (writeBuffer) this.renderer.setRenderTarget(null)
     }
 
     // 恢复原始渲染器状态

@@ -203,8 +203,8 @@ vec2 sdf(vec3 position){
   float pnoise = 1.0 + perlin(noise);
   // vec2 box = roundBox(position, vec3(7.2, 0.05, 0.05), 0.5, zero, quaternion + vec4(1.0, 1.0, 1.0, PI / 4.0));
   // vec2 box2 = roundBox(position, vec3(7.2, 0.05, 0.05), 0.5, zero, quaternion + vec4(1.0, 1.0, 1.0, -PI / 4.0));
-  vec2 sph = sphere(position, 7.0, zero, quaternion);
-  vec2 sph2 = sphere(position, 6.0, zero + 2.0 * sin(uTime), quaternion) + perlin( position + uTime ) * 0.015;
+  vec2 sph = sphere(position, 7.0, zero, quaternion)+ perlin( position + uTime ) * 0.02;
+  vec2 sph2 = sphere(position, 6.0, zero + 2.0 * sin(uTime), quaternion) + perlin( position + uTime ) * 0.3;
   vec2 sph3 = sphere(position, 3.0, zero + 4.0 * cos(uTime), quaternion) + perlin( position + uTime ) * 0.1;
 
   return smin(sph3, smin(sph, sph2, pnoise), pnoise);
