@@ -1,18 +1,12 @@
 // import { RainDemo } from './rain/RainDemo'
 import { DracoDemo } from './draco/DracoDemo'
-import * as dat from 'dat.gui'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
-import GeometryStats from '../util/performance/GeometryStats'
+import Stats from '../util/stats/Stats'
 
 /**
  * 测试用例类
  */
 export class Testcase {
-  data = {
-    bunnyGPUMemory: '0 bytes',
-    totalGPUMemory: '0 bytes',
-  }
-
   /**
    * 测试用例构造函数
    */
@@ -32,18 +26,9 @@ export class Testcase {
    * 初始化
    */
   init() {
-    GeometryStats.registerRenderer(this.app.renderer)
+    Stats.register(this.app.renderer.getContext())
     // this.rain = new RainDemo(this.app)
     this.draco = new DracoDemo(this.app)
-
-    // dat.gui
-    const gui = new dat.GUI()
-    const folder = gui.addFolder('Memory Info')
-    folder.open()
-    this.bunnyInfo = folder.add(this.data, 'bunnyGPUMemory', '0 bytes')
-    this.totalInfo = folder.add(this.data, 'totalGPUMemory', '0 bytes')
-    // this.fallDisplay = folder.add(this.data, 'rainFallGPUMemory', '0 bytes')
-    // this.ballDisplay = folder.add(this.data, 'ballGPUMemory', '0 bytes')
   }
 
   /**
@@ -52,8 +37,8 @@ export class Testcase {
   update() {
     if (this.rain) {
       const { rainFallGeometry, ballGeometry } = this.rain.update()
-      if (ballGeometry) this.ballDisplay.setValue(BufferGeometryUtils.estimateBytesUsed(ballGeometry) + ' bytes')
-      if (rainFallGeometry) this.fallDisplay.setValue(BufferGeometryUtils.estimateBytesUsed(rainFallGeometry) + ' bytes')
+      // if (ballGeometry) this.ballDisplay.setValue(BufferGeometryUtils.estimateBytesUsed(ballGeometry) + ' bytes')
+      // if (rainFallGeometry) this.fallDisplay.setValue(BufferGeometryUtils.estimateBytesUsed(rainFallGeometry) + ' bytes')
     }
   }
 }
