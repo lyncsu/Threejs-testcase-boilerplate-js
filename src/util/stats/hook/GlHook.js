@@ -3,20 +3,18 @@
  */
 export class GlHook {
   _drawCall = -1
-  _originalGlDrawElements
-  _originalGlDrawArrays
 
   /**
    * GL计数钩子构造函数
    * @param glContext 原生gl对象
+   * @param info three渲染器绘制信息
    */
-  constructor(glContext, info) {
+  constructor(glContext, rendererInfo) {
     if (!glContext || !glContext.drawElements) return
     this.glContext = glContext
-    // 如果有rendererInfo
-    if (info) {
-      this.info = info
-      this.hasInfo = true
+    // 使用threejs原生统计renderer.info.render
+    if (rendererInfo) {
+      this.info = rendererInfo
       return
     }
 
@@ -45,7 +43,7 @@ export class GlHook {
   }
 
   /**
-   * 重置
+   * 重置计数
    */
   reset() {
     this._drawCall = 0
@@ -68,5 +66,12 @@ export class GlHook {
    */
   get drawCall() {
     return this.info ? (this._drawCall = this.info.calls) : this._drawCall
+  }
+
+  /**
+   * 面数
+   */
+  get faceCount() {
+    return this.info ? this.info.triangles : 0
   }
 }

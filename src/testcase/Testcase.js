@@ -26,7 +26,7 @@ export class Testcase {
    * 初始化
    */
   init() {
-    Stats.register(this.app.renderer.getContext(), this.app.renderer.info.render)
+    Stats.register(this.app.renderer)
     // this.rain = new RainDemo(this.app)
     this.draco = new DracoDemo(this.app)
   }

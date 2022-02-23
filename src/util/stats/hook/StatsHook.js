@@ -10,18 +10,14 @@ export class StatsHook {
    * @param {*} glContext
    */
   constructor(glContext, info) {
-    this._glHook = new GlHook(glContext, info)
-    this._textureHook = new TextureHook(glContext)
+    this._glHook = new GlHook(glContext, info.render)
+    this._textureHook = new TextureHook(glContext, info.memory)
   }
 
   /**
-   * 更新计数
+   * 更新
    */
-  update() {
-    // if (this.drawCallPanel) this.drawCallPanel.update(this.hook.deltaDrawCall, Math.max(500, this.hook.maxDeltaDrawCall))
-    // if (this._texturePanel) this._texturePanel.update(this.hook.textureCount, Math.max(20, this.hook.maxTextureCount))
-    // this._stats.update()
-  }
+  update() {}
 
   /**
    * 重置
@@ -67,17 +63,8 @@ export class StatsHook {
   /**
    * 材质数量
    */
-  get textureCount() {
-    if (this._textureHook) return this._textureHook.textureCount
-
-    return 0
-  }
-
-  /**
-   * 最大材质数量
-   */
-  get maxTextureCount() {
-    if (this._textureHook) return this._textureHook.maxTextureCount
+  get textureCall() {
+    if (this._textureHook) return this._textureHook.textureCall
     return 0
   }
 }

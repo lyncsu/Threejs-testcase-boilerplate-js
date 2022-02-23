@@ -25,13 +25,13 @@ class Stats {
    * 注册gl实例
    * @param {*} glContext
    */
-  register(glContext, info) {
-    this.glContext = glContext
-    console.info(this.glContext)
+  register(renderer) {
+    if (!renderer) return
+    this.glContext = renderer.getContext()
     // 打印gl信息
     this.info(['VERSION', 'MAX_TEXTURE_SIZE', 'MAX_VERTEX_ATTRIBS', 'MAX_DRAW_BUFFERS'])
     // 注册钩子
-    this.hook = new StatsHook(this.glContext, info)
+    this.hook = new StatsHook(this.glContext, renderer.info)
   }
 
   /**
@@ -138,11 +138,10 @@ class Stats {
    * 更新统计hook
    */
   update() {
-    console.info('hook', this.hook)
     if (this.hook) {
       this.hook.update()
 
-      console.info(this.hook.drawCall)
+      console.info('drawCall', this.hook.drawCall, 'textureCall', this.hook.textureCall)
     }
   }
 }

@@ -56,11 +56,6 @@ export class App {
     this.textureCube = textureCube
     this.scene.background = textureCube
 
-    // const directional = new THREE.DirectionalLight(0xffffff, 0.15)
-    // directional.position.set(0, 300, -2000)
-    // this.app.scene.add(directional)
-    // directional.target = this.app.scene
-
     const ambient = new THREE.AmbientLight(0xeeeeee, 0.75)
     this.scene.add(ambient)
 
