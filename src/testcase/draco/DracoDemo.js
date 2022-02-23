@@ -18,7 +18,6 @@ export class DracoDemo extends Demo {
     const res = await loader.loadAsync('static/assets/model/bunny.gltf')
     this.app.scene.add(res.scene)
 
-    Stats.addTable('GPU Memory', true)
     const totalBytes = Stats.stat(this.app.scene)
     Stats.add('Total', `${numeral(totalBytes).format('0,0')} bytes`, 'GPU Memory')
     Stats.addButton('button', () => {

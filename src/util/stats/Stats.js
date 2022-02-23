@@ -18,6 +18,7 @@ class Stats {
    */
   init() {
     this.data = {}
+    this.input = {}
     this.gui = new dat.GUI()
   }
 
@@ -32,6 +33,16 @@ class Stats {
     this.info(['VERSION', 'MAX_TEXTURE_SIZE', 'MAX_VERTEX_ATTRIBS', 'MAX_DRAW_BUFFERS'])
     // 注册钩子
     this.hook = new StatsHook(this.glContext, renderer.info)
+    this.initMemoryStats()
+  }
+
+  /**
+   * 初始化GPU内存字段
+   */
+  initMemoryStats() {
+    this.addTable('GPU Memory', true)
+    this.input['Draw call'] = this.add('Draw call', this.hook.drawCall, 'GPU Memory')
+    this.input['Texture call'] = this.add('Texture call', this.hook.textureCall, 'GPU Memory')
   }
 
   /**
@@ -78,6 +89,7 @@ class Stats {
   add(key, value, tableName) {
     if (this.data[key] === undefined) this.data[key] = value
 
+    if (!this.tables) this.tables = new Map()
     const table = this.tables.get(tableName)
     if (!table) return this.gui.add(this.data, key, value)
     return this.tables.get(tableName).add(this.data, key, value)
@@ -141,7 +153,8 @@ class Stats {
     if (this.hook) {
       this.hook.update()
 
-      console.info('drawCall', this.hook.drawCall, 'textureCall', this.hook.textureCall)
+      this.input['Draw call'].setValue(this.hook.drawCall)
+      this.input['Texture call'].setValue(this.hook.textureCall)
     }
   }
 }
