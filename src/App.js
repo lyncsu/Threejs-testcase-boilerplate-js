@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import { Testcase } from './testcase/Testcase'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Constant } from './Constant'
-import Stats from 'three/examples/jsm/libs/stats.module.js'
+import FPS from 'three/examples/jsm/libs/stats.module.js'
+import Stats from './util/stats/Stats'
 import { Composer } from './postprocessing/Composer'
 
 export class App {
@@ -102,15 +103,17 @@ export class App {
   }
 
   initStats() {
-    this.stats = new Stats()
-    this.domElement.appendChild(this.stats.dom)
+    this.fps = new FPS()
+    this.domElement.appendChild(this.fps.dom)
   }
 
   render() {
+    // 重制drawElement计数器
+    Stats.reset()
     // this.renderer.render(this.scene, this.camera)
     if (this.composer) this.composer.render()
-    // if (this.testcase) this.testcase.update()
-    if (this.stats) this.stats.update()
+    if (this.testcase) this.testcase.update()
+    if (this.fps) this.fps.update()
   }
 
   resize() {

@@ -26,7 +26,7 @@ export class Testcase {
    * 初始化
    */
   init() {
-    Stats.register(this.app.renderer.getContext())
+    Stats.register(this.app.renderer.getContext(), this.app.renderer.info.render)
     // this.rain = new RainDemo(this.app)
     this.draco = new DracoDemo(this.app)
   }
@@ -35,6 +35,7 @@ export class Testcase {
    * 更新demo
    */
   update() {
+    if (this.draco) this.draco.update()
     if (this.rain) {
       const { rainFallGeometry, ballGeometry } = this.rain.update()
       // if (ballGeometry) this.ballDisplay.setValue(BufferGeometryUtils.estimateBytesUsed(ballGeometry) + ' bytes')

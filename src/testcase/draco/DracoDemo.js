@@ -25,4 +25,8 @@ export class DracoDemo extends Demo {
       console.info('todo')
     })
   }
+
+  update() {
+    Stats.update()
+  }
 }

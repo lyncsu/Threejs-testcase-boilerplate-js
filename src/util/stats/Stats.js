@@ -1,5 +1,6 @@
 import * as dat from 'dat.gui'
 import * as numeral from 'numeral'
+import { StatsHook } from './hook/StatsHook'
 
 /**
  * 统计模块类
@@ -22,18 +23,28 @@ class Stats {
 
   /**
    * 注册gl实例
-   * @param {*} gl
+   * @param {*} glContext
    */
-  register(gl) {
-    this.glContext = gl
-    console.info(
-      'VERSION:',
-      this.glContext.getParameter(this.glContext.VERSION),
-      'MAX_TEXTURE_SIZE:',
-      this.glContext.getParameter(this.glContext.MAX_TEXTURE_SIZE),
-      'MAX_RENDERBUFFER_SIZE:',
-      this.glContext.getParameter(this.glContext.MAX_RENDERBUFFER_SIZE)
-    )
+  register(glContext, info) {
+    this.glContext = glContext
+    console.info(this.glContext)
+    // 打印gl信息
+    this.info(['VERSION', 'MAX_TEXTURE_SIZE', 'MAX_VERTEX_ATTRIBS', 'MAX_DRAW_BUFFERS'])
+    // 注册钩子
+    this.hook = new StatsHook(this.glContext, info)
+  }
+
+  /**
+   * 打印gl节点
+   * @param {*} key
+   */
+  info(key) {
+    if (key instanceof Array) key.forEach(item => this.info(item))
+    else
+      console.info(
+        `Stats %c ${key}: ${this.glContext.getParameter(this.glContext[key])}`,
+        'background:#fffbdb;color:#5c3c00;padding-left:1px;padding-right:6px;border-left:solid 1px #5c3c00;'
+      )
   }
 
   /**
@@ -117,6 +128,22 @@ class Stats {
     const indices = geometry.getIndex()
     bytes += indices ? indices.count * indices.itemSize * indices.array.BYTES_PER_ELEMENT : 0
     return bytes
+  }
+
+  reset() {
+    if (this.hook) this.hook.reset()
+  }
+
+  /**
+   * 更新统计hook
+   */
+  update() {
+    console.info('hook', this.hook)
+    if (this.hook) {
+      this.hook.update()
+
+      console.info(this.hook.drawCall)
+    }
   }
 }
 
