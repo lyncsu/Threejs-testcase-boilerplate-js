@@ -1,5 +1,6 @@
 import * as dat from 'dat.gui'
 import * as numeral from 'numeral'
+import { WebGLCapabilities } from 'three/src/renderers/webgl/WebGLCapabilities'
 import { StatsHook } from './hook/StatsHook'
 
 /**
@@ -30,7 +31,9 @@ class Stats {
     if (!renderer) return
     this.glContext = renderer.getContext()
     // 打印gl信息
-    this.info(['VERSION', 'MAX_TEXTURE_SIZE', 'MAX_VERTEX_ATTRIBS', 'MAX_DRAW_BUFFERS'])
+    this.info(['VERSION', 'MAX_TEXTURE_SIZE', 'MAX_SAMPLES'])
+    const capabilities = new WebGLCapabilities(this.glContext, this.glContext.getSupportedExtensions(), {})
+    this.info('FLOAT_TEXTURE', capabilities.floatVertexTextures)
     // 注册钩子
     this.hook = new StatsHook(this.glContext, renderer.info)
     this.initMemoryStats()
@@ -49,8 +52,13 @@ class Stats {
    * 打印gl节点
    * @param {*} key
    */
-  info(key) {
-    if (key instanceof Array) key.forEach(item => this.info(item))
+  info(key, value) {
+    if (value) {
+      console.info(
+        `Stats %c ${key}: ${value}`,
+        'background:#fffbdb;color:#5c3c00;padding-left:1px;padding-right:6px;border-left:solid 1px #5c3c00;'
+      )
+    } else if (key instanceof Array) key.forEach(item => this.info(item))
     else
       console.info(
         `Stats %c ${key}: ${this.glContext.getParameter(this.glContext[key])}`,
