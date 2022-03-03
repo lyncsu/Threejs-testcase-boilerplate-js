@@ -759,7 +759,7 @@ void main() {
 	getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
 	// directionalLightShadow = directionalLightShadows[ 0 ];
 
-	float shadowMultiplier = all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ 0 ], vec2(2048.0, 2048.0), 0.0, 0.0, vDirectionalShadowCoord[ 0 ] ) : 1.0;
+	float shadowMultiplier = all( bvec2( directLight.visible, receiveShadow ) ) ? 1.0 : 1.0;
 	vec3 shadowedColor = directLight.color * shadowMultiplier;
 	directLight.color = shadowedColor;
 
