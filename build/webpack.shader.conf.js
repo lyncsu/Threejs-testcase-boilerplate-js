@@ -15,16 +15,13 @@ const os = require('os')
 
 const devConfig = merge(baseConfig, {
   mode: 'development',
-  // output: {
-  //   library: 'LYNC',
-  //   libraryTarget: 'umd',
-  // },
+  entry: ['./src/debug/shader/ShaderDebug.js', './src/App.js'],
   devtool: config.dev.devtool,
   watch: config.dev.watch,
   watchOptions: config.dev.watchOptions,
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': '"development"',
+      'process.env': '"SHADER_DEBUG"',
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',

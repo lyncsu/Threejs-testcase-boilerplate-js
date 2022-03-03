@@ -5,10 +5,13 @@ import { Constant } from './Constant'
 import FPS from 'three/examples/jsm/libs/stats.module.js'
 import Stats from './util/stats/Stats'
 import { Composer } from './postprocessing/Composer'
+import { ShaderDebugRenderer } from './debug/shader/ShaderDebugRenerer'
+import { ShaderDebug } from './debug/shader/ShaderDebug'
 
 export class App {
-  constructor(domElement) {
+  constructor(domElement, shaderDebugMode) {
     this.domElement = domElement
+    this.isShaderDebugMode = shaderDebugMode
 
     this.init()
     this.resize()
@@ -29,7 +32,8 @@ export class App {
     this.initEventListener()
     this.initScene()
     this.initCamera()
-    this.initRenderer()
+    if (this.isShaderDebugMode) this.shaderDebug = new ShaderDebug()
+    this.initRenderer(this.isShaderDebugMode)
     this.initComposer()
     this.intTestcase()
     this.initOrbit()
@@ -56,27 +60,51 @@ export class App {
     this.textureCube = textureCube
     this.scene.background = textureCube
 
+    // const floor = new THREE.Mesh(new THREE.PlaneBufferGeometry(), new THREE.ShadowMaterial({ side: 2, transparent: true, opacity: 0.25 }))
+    // floor.scale.set(10, 10, 10)
+    // floor.position.set(0, -1, 0)
+    // floor.rotation.x = -Math.PI / 2
+    // floor.receiveShadow = true
+    // this.scene.add(floor)
+
+    // Lights
     const ambient = new THREE.AmbientLight(0xeeeeee, 0.75)
     this.scene.add(ambient)
 
-    const lightPosition = new THREE.Vector3(15, 2.5, 5)
-    const light = new THREE.PointLight(0x684b7c, 0.5)
-    light.position.copy(lightPosition)
-    this.scene.add(light)
-    this.light = light
+    // const lightPosition = new THREE.Vector3(15, 2.5, 5)
+    // const light = new THREE.PointLight(0x684b7c, 0.5)
+    // light.position.copy(lightPosition)
+    // this.scene.add(light)
+    // this.light = light
 
-    const helper = new THREE.PointLightHelper(light, 1)
-    this.scene.add(helper)
+    // const helper = new THREE.PointLightHelper(light, 1)
+    // this.scene.add(helper)
+
+    this.scene.add(new THREE.HemisphereLight(0xffc107, 0x552233, 0.2))
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 4)
+    directionalLight.position.set(2.5, 4, 2)
+    // directionalLight.shadow.mapSize.set(2048, 2048)
+    // directionalLight.castShadow = true
+    this.scene.add(directionalLight)
 
     const grid = new THREE.GridHelper(15, 30)
     this.scene.add(grid)
   }
 
-  initRenderer() {
-    this.renderer = new THREE.WebGLRenderer()
-    this.renderer.autoClear = true
-    this.renderer.setClearColor(0x000000)
-    // this.renderer.setPixelRatio(1)
+  initRenderer(shaderDebugMode) {
+    if (shaderDebugMode) {
+      this.renderer = new ShaderDebugRenderer()
+      this.renderer.shadowMap.enabled = true
+      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
+      this.renderer.outputEncoding = THREE.sRGBEncoding
+      this.renderer.setClearColor(0x0d1113)
+    } else {
+      this.renderer = new THREE.WebGLRenderer()
+      this.renderer.autoClear = true
+      this.renderer.setClearColor(0x000000)
+    }
+    this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.domElement.style.outline = 'none'
     this.domElement.appendChild(this.renderer.domElement)
   }
@@ -131,4 +159,9 @@ export class App {
   }
 }
 
-new App(document.getElementById('webgl-container'))
+const isShaderDebugMode = Boolean(process.env === 'SHADER_DEBUG')
+const webglContainer = document.createElement('div')
+webglContainer.id = 'webgl-container'
+document.body.appendChild(webglContainer)
+webglContainer.style.width = isShaderDebugMode ? '50vw' : '100vw'
+export default new App(webglContainer, isShaderDebugMode)

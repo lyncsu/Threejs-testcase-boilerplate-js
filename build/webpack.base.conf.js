@@ -3,7 +3,7 @@
 const utils = require('./utils')
 
 module.exports = {
-  entry: ['@babel/polyfill', './src/App.js'],
+  entry: ['@babel/polyfill'],
   resolve: {
     modules: ['src', 'node_modules'],
     extensions: ['.js', '.ts'],

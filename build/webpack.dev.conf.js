@@ -19,12 +19,13 @@ const devConfig = merge(baseConfig, {
   //   library: 'LYNC',
   //   libraryTarget: 'umd',
   // },
+  entry: ['./src/App.js'],
   devtool: config.dev.devtool,
   watch: config.dev.watch,
   watchOptions: config.dev.watchOptions,
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': '"development"',
+      'process.env': '"DEV"',
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',

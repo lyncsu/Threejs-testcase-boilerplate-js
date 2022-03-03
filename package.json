@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "shader":"webpack-dev-server --inline --progress --config build/webpack.shader.conf.js",
     "test": "jest"
   },
   "author": "Lync Su",
@@ -12,7 +13,8 @@
   "dependencies": {
     "dat.gui": "^0.7.7",
     "numeral": "^2.0.6",
-    "three": "^0.137.4"
+    "three": "^0.137.4",
+    "three-mesh-bvh": "^0.5.5"
   },
   "devDependencies": {
     "@babel/core": "^7.16.5",

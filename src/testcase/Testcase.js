@@ -1,7 +1,8 @@
-// import { RainDemo } from './rain/RainDemo'
+import { RainDemo } from './rain/RainDemo'
 import { DracoDemo } from './draco/DracoDemo'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import Stats from '../util/stats/Stats'
+import { ShaderDebugDemo } from './shaderdebug/ShaderDebugDemo'
 
 /**
  * 测试用例类
@@ -28,7 +29,8 @@ export class Testcase {
   init() {
     Stats.register(this.app.renderer)
     // this.rain = new RainDemo(this.app)
-    this.draco = new DracoDemo(this.app)
+    // this.draco = new DracoDemo(this.app)
+    this.shaderDebug = new ShaderDebugDemo(this.app)
   }
 
   /**
