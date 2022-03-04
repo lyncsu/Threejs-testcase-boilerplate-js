@@ -80,6 +80,7 @@ export class ShaderDebugDemo extends Demo {
           result.scene.position.y = 3
           result.scene.scale.set(3, 3, 3)
           this.app.scene.add(result.scene)
+          this.app.shaderDebug.update()
         })
       })
   }

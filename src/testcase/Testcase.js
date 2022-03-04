@@ -30,7 +30,7 @@ export class Testcase {
     Stats.register(this.app.renderer)
     // this.rain = new RainDemo(this.app)
     // this.draco = new DracoDemo(this.app)
-    this.shaderDebug = new ShaderDebugDemo(this.app)
+    if (this.app.isShaderDebugMode) this.shaderDebug = new ShaderDebugDemo(this.app)
   }
 
   /**

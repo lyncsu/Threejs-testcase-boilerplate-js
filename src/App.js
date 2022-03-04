@@ -99,6 +99,7 @@ export class App {
       this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
       this.renderer.outputEncoding = THREE.sRGBEncoding
       this.renderer.setClearColor(0x0d1113)
+      this.shaderDebug.renderer = this.renderer
     } else {
       this.renderer = new THREE.WebGLRenderer()
       this.renderer.autoClear = true
@@ -160,8 +161,12 @@ export class App {
 }
 
 const isShaderDebugMode = Boolean(process.env === 'SHADER_DEBUG')
+const leftContainer = document.createElement('div')
+leftContainer.id = 'left-container'
+document.body.appendChild(leftContainer)
 const webglContainer = document.createElement('div')
 webglContainer.id = 'webgl-container'
-document.body.appendChild(webglContainer)
-webglContainer.style.width = isShaderDebugMode ? '50vw' : '100vw'
+webglContainer.style.width = leftContainer.style.width = isShaderDebugMode ? '50vw' : '100vw'
+leftContainer.appendChild(webglContainer)
+leftContainer.appendChild(Stats.gui.domElement)
 export default new App(webglContainer, isShaderDebugMode)

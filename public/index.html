@@ -14,23 +14,32 @@
       color: #80cbc4;
     }
 
+    #left-container {
+      position: relative;
+    }
+
     #webgl-container {
       position: absolute;
       left: 0px;
       height: 100vh;
     }
 
-    #text-container {
+    #right-container {
       position: absolute;
-      font-family: Monospace;
-      font-size: 13px;
-      color: #fff;
       left: 50%;
       width: 50vw;
       height: 100vh;
-      background: #161d20;
+      overflow: scroll;
+    }
+
+    #text-container {
+      font-family: Menlo, Monaco, 'Courier New', monospace;
+      font-size: 13px;
+      color: #fcfcfa;
+      background: #2d2a2e;
       text-align: left;
       overflow: auto;
+      display: table-cell;
     }
 
     #text-container > div {
@@ -49,14 +58,16 @@
       padding-left: 8px;
       width: 3em;
       opacity: 0.25;
+      color: #ccc;
+      font-style: normal;
     }
 
     #text-container > div:nth-child(odd) {
-      background: rgba(255, 255, 255, 0.025);
+      background: #383539;
     }
 
     #text-container > div > span {
-      color: #ffc107;
+      color: #ffd866;
     }
 
     #text-container > div > span:hover,
@@ -65,6 +76,16 @@
       padding: 3px;
       margin: -3px;
       border-radius: 3px;
+    }
+
+    #text-container > div.comment {
+      color: #716f71;
+      font-style: italic;
+    }
+
+    .dg.main.a {
+      position: absolute;
+      right: 0;
     }
   </style>
   <body></body>
