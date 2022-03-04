@@ -141,7 +141,6 @@ export class ShaderDebug {
             type="${type}"
           >${name}</span>`.replace(/\n/g, '')
         const delta = insert.length - name.length
-
         resultShader = ShaderDebugUtil.splice(resultShader, insert, before + accumOffset, after - before)
         accumOffset += delta
       }
