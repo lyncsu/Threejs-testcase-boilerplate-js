@@ -44,12 +44,12 @@ export class ShaderDebugMaterial extends ShaderMaterial {
 
     super(shader)
     this.uniforms._multiplier_ = { value: 1.0 }
-    this.uniforms._offset_ = { value: 1.0 }
+    this.uniforms._offset_ = { value: 0.0 }
     this.targetMaterial = material
     this._currType = null
-
     this.vertexDefinitions = null
     this.fragmentDefinitions = null
+
     this.updateDefinitions()
   }
 

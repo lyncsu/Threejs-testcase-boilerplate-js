@@ -246,19 +246,16 @@ export default class ShaderDebugUtil {
 
   // 获取主程序内的uniforms, attributes, varyings等调试变量
   static parseVariables(text) {
-    // If there's no main function lets bail
     const mainRegex = /void\s*main\s*\(.*?\)[\s\S]*\{/
     const matches = text.match(mainRegex)
-    if (!matches) {
-      return null
-    }
+    if (!matches) return null
 
-    // Get the globals
+    // Globals
     const varyings = this.parseGlobals('varying', text)
     const uniforms = this.parseGlobals('uniform', text)
     const attributes = this.parseGlobals('attribute', text)
 
-    // Get the locals
+    // Locals
     const localVariables = this.parseLocalVariables(text)
     const beforeMainIndex = matches.index
     const afterMainIndex = matches.index + matches[0].length

@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 import { Demo } from '../base/Demo'
-import * as FragementShader from './StandardShader.fs'
+import * as FragementShader from './StandardFragment.fs'
 import { ShaderDebugMaterial } from '../../debug/shader/ShaderDebugMaterial'
 
 /**
@@ -27,12 +27,11 @@ export class ShaderDebugDemo extends Demo {
       texture.dispose()
       pmremGenerator.dispose()
 
-      const result = await new GLTFLoader().loadAsync('./static/assets/model/helmet.glb')
+      const result = await new GLTFLoader().loadAsync('./static/assets/model/helmet.gltf')
       result.scene.traverse(child => {
         if (child.isMesh) {
           const originalMaterial = child.material
           const newMaterial = new THREE.ShaderMaterial(THREE.ShaderLib.standard)
-          newMaterial.fragmentShader = FragementShader
           newMaterial.uniforms.map.value = originalMaterial.map
           newMaterial.uniforms.normalMap.value = originalMaterial.normalMap
           newMaterial.uniforms.normalScale.value = originalMaterial.normalScale
@@ -46,6 +45,7 @@ export class ShaderDebugDemo extends Demo {
           newMaterial.uniforms.envMap.value = envMap
           newMaterial.uniforms.flipEnvMap.value = 1
           newMaterial.uniforms.envMapIntensity.value = 0.25
+          newMaterial.fragmentShader = FragementShader
           newMaterial.uniforms.emissive.value.copy(originalMaterial.emissive)
           newMaterial.uniforms.diffuse.value.copy(originalMaterial.color)
           newMaterial.lights = true
@@ -70,6 +70,7 @@ export class ShaderDebugDemo extends Demo {
           debugMaterial = new ShaderDebugMaterial(newMaterial)
           this.app.renderer.debugMaterial = debugMaterial
 
+          console.info(debugMaterial)
           child.castShadow = true
           child.receiveShadow = true
         }

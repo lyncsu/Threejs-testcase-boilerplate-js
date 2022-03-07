@@ -134,8 +134,8 @@ export class App {
   render() {
     // 重制drawElement计数器
     Stats.reset()
-    // this.renderer.render(this.scene, this.camera)
-    if (this.composer) this.composer.render()
+    this.renderer.render(this.scene, this.camera)
+    // if (this.composer) this.composer.render()
     if (this.testcase) this.testcase.update()
     if (this.fps) this.fps.update()
   }
