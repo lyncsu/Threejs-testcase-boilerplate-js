@@ -18,9 +18,8 @@ export class ShaderDebug {
    * Shader调试器构造函数
    */
   constructor() {
-    this.init()
-
     this.bindScope()
+    this.init()
   }
 
   bindScope() {
@@ -60,8 +59,8 @@ export class ShaderDebug {
   onMouseOut(e) {
     if (!this.debugRenderer || !this.debugRenderer.debugMaterial) return
     if (e.target.tagName === 'SPAN') {
-      if (savedVars) {
-        this.debugMaterial.setFragmentOutputVariable(...savedVars)
+      if (this.savedVars) {
+        this.debugMaterial.setFragmentOutputVariable(...this.savedVars)
       } else {
         this.debugMaterial.clearOutputVariable()
         this.debugRenderer.enableDebug = false
@@ -81,11 +80,11 @@ export class ShaderDebug {
       const name = target.getAttribute('name')
       const index = Number(target.getAttribute('index')) || null
       const type = target.getAttribute('type')
-      savedVars = [name, type, index]
+      this.savedVars = [name, type, index]
       target.classList.add('selected')
     } else {
       this.debugMaterial.clearOutputVariable()
-      savedVars = null
+      this.savedVars = null
       this.debugRenderer.enableDebug = false
     }
   }

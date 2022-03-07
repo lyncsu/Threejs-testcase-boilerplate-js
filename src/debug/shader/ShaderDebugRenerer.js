@@ -26,24 +26,6 @@ export class ShaderDebugRenderer extends THREE.WebGLRenderer {
     this.render = this._proxyRender
     this.containerScale = 20
     this.containerDimensions = 5
-
-    const domElement = this.domElement
-    domElement.addEventListener('mouseleave', () => {
-      this._hoverActive = false
-      container.visible = false
-    })
-
-    domElement.addEventListener('mousemove', e => {
-      this._hoverActive = true
-      this._lastPixelX = e.clientX
-      this._lastPixelY = e.clientY
-      container.scale = this.containerScale
-      container.dimensions = this.containerDimensions
-      container.copyCanvas(domElement)
-      container.setPixel(e.clientX, e.clientY)
-      container.setPosition(e.clientX, e.clientY)
-      container.visible = this.enableDebug
-    })
   }
 
   bindScope() {
@@ -75,7 +57,8 @@ export class ShaderDebugRenderer extends THREE.WebGLRenderer {
         }
       })
 
-      const originalClearColor = this.getClearColor()
+      const originalClearColor = new THREE.Color()
+      this.getClearColor(originalClearColor)
       const originalClearAlpha = this.clearAlpha
       const originalBackground = scene.background
 
@@ -101,27 +84,11 @@ export class ShaderDebugRenderer extends THREE.WebGLRenderer {
     } else {
       this._originalRender(scene, camera)
     }
-
-    if (this._hoverActive) {
-      const domElement = this.domElement
-      container.copyCanvas(domElement)
-
-      if (this.debugMaterial) {
-        const ratioX = domElement.width / domElement.offsetWidth
-        const ratioY = domElement.height / domElement.offsetHeight
-
-        const x = Math.floor(this._lastPixelX * ratioX)
-        const y = Math.floor(this._lastPixelY * ratioY)
-        const result = this.readPixel(x, y, this.debugMaterial._currType)
-        container.setValue(...result)
-      }
-    }
   }
 
   readPixel(x, y, type) {
     const readTarget = this.readTarget
     const buffer = new Float32Array(4)
-
     const height = readTarget.texture.image.height
     this.readRenderTargetPixels(readTarget, x, height - 1 - y, 1, 1, buffer)
 
@@ -159,14 +126,13 @@ export class ShaderDebugRenderer extends THREE.WebGLRenderer {
   }
 
   _updateReadTarget(scene, camera) {
-    if (!this.enableDebug) {
-      return
-    }
+    if (!this.enableDebug) return
 
     const debugMaterial = this.debugMaterial
     const readTarget = this.readTarget
     const originalRenderTarget = this.getRenderTarget()
-    const originalClearColor = this.getClearColor()
+    const originalClearColor = new THREE.Color()
+    this.getClearColor(originalClearColor)
     const originalClearAlpha = this.clearAlpha
     const originalBackground = scene.background
     const originalMultiplier = debugMaterial.multiplier

@@ -1,6 +1,9 @@
 import { ShaderMaterial } from 'three'
 import ShaderDebugUtil from './ShaderDebugUtil.js'
 
+/**
+ * Shader调试材质类
+ */
 export class ShaderDebugMaterial extends ShaderMaterial {
   get multiplier() {
     return this.uniforms._multiplier_.value
@@ -18,6 +21,10 @@ export class ShaderDebugMaterial extends ShaderMaterial {
     this.uniforms._offset_.value = value
   }
 
+  /**
+   * Shader调试材质构造函数
+   * @param {*} shaderOrMaterial
+   */
   constructor(shaderOrMaterial) {
     let shader, material
 

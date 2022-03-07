@@ -1,10 +1,22 @@
 export default class ShaderDebugUtil {
-  // Splice a new string into the target string
+  /**
+   * 切割字符串
+   * @param {*} str
+   * @param {*} newSubStr
+   * @param {*} start
+   * @param {*} delCount
+   * @returns
+   */
   static splice(str, newSubStr, start, delCount = 0) {
     return str.slice(0, start) + newSubStr + str.slice(start + delCount)
   }
 
-  // Parse the global variables with the given prefix out
+  /**
+   * 解析全局变量
+   * @param {*} prefix
+   * @param {*} text
+   * @returns
+   */
   static parseGlobals(prefix, text) {
     // Find the declarations
     const result = []
@@ -25,7 +37,11 @@ export default class ShaderDebugUtil {
     return result
   }
 
-  // Find the local variables of main
+  /**
+   * 获取主函数内部局部变量
+   * @param {*} text
+   * @returns
+   */
   static parseLocalVariables(text) {
     const result = []
     const mainRegex = /void\s*main\s*\(.*?\)[\s\S]*\{/
@@ -78,6 +94,13 @@ export default class ShaderDebugUtil {
     return result
   }
 
+  /**
+   * 解析变量声明
+   * @param {*} body
+   * @param {*} startIndex
+   * @param {*} endIndex
+   * @returns
+   */
   static parseDeclarations(body, startIndex, endIndex) {
     body = body.substr(0, endIndex)
 
@@ -142,11 +165,16 @@ export default class ShaderDebugUtil {
     return result
   }
 
+  /**
+   * 获取索引值
+   * @param {*} text
+   * @param {*} line
+   * @param {*} column
+   * @returns
+   */
   static lineColToIndex(text, line, column) {
     const lines = text.split(/\n/g)
-    if (line >= lines.length) {
-      return -1
-    }
+    if (line >= lines.length) return -1
 
     let result = 0
     for (let i = 0; i < line; i++) {
@@ -158,6 +186,12 @@ export default class ShaderDebugUtil {
     return result
   }
 
+  /**
+   * 获取作用域
+   * @param {*} text
+   * @param {*} index
+   * @returns
+   */
   static getScopeDepth(text, index) {
     const braceRegex = /[{}]/g
     let braceCount = 0
@@ -177,10 +211,14 @@ export default class ShaderDebugUtil {
     return braceCount
   }
 
+  /**
+   * 获取括号内容
+   * @param {*} text
+   * @returns
+   */
   static getMainExtents(text) {
     const mainRegex = /void\s*main\s*\(.*?\)[\s\S]*?\{/g
     const mainResult = mainRegex.exec(text)
-
     const braceRegex = /[{}]/g
     braceRegex.lastIndex = mainRegex.lastIndex + mainResult[0].length
 
@@ -206,7 +244,7 @@ export default class ShaderDebugUtil {
     return { before, after, end }
   }
 
-  // Collect the uniforms, attributes, varyings, and locals used in a given shader main function
+  // 获取主程序内的uniforms, attributes, varyings等调试变量
   static parseVariables(text) {
     // If there's no main function lets bail
     const mainRegex = /void\s*main\s*\(.*?\)[\s\S]*\{/
@@ -222,7 +260,6 @@ export default class ShaderDebugUtil {
 
     // Get the locals
     const localVariables = this.parseLocalVariables(text)
-
     const beforeMainIndex = matches.index
     const afterMainIndex = matches.index + matches[0].length
 
