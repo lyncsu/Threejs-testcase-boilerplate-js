@@ -5,14 +5,6 @@ import ShaderDebugUtil from './ShaderDebugUtil.js'
  * Shader调试材质类
  */
 export class ShaderDebugMaterial extends ShaderMaterial {
-  get multiplier() {
-    return this.uniforms._multiplier.value
-  }
-
-  set multiplier(value) {
-    this.uniforms._multiplier.value = value
-  }
-
   get offset() {
     return this.uniforms._offset.value
   }
@@ -43,8 +35,7 @@ export class ShaderDebugMaterial extends ShaderMaterial {
     }
 
     super(shader)
-    this.uniforms._multiplier = { value: 1.0 }
-    this.uniforms._offset = { value: 0.0 }
+    this.uniforms._offset = { value: 0.1 }
     this.targetMaterial = material
     this._currType = null
     this.vertexDefinitions = null
@@ -76,7 +67,7 @@ export class ShaderDebugMaterial extends ShaderMaterial {
     this.fragmentShader = this.fragmentShader.replace(/gl_FragColor[^;=]*?=[^;]*;/g, ';')
     this.fragmentShader = ShaderDebugUtil.splice(
       this.fragmentShader,
-      '\ngl_FragColor = _varying_output * _multiplier + _offset * _multiplier; return;\n',
+      '\ngl_FragColor = _varying_output + _offset; return;\n',
       ShaderDebugUtil.getMainExtents(this.fragmentShader).after
     )
     this.fragmentShader = ShaderDebugUtil.splice(
@@ -167,25 +158,25 @@ export class ShaderDebugMaterial extends ShaderMaterial {
     } else {
       switch (type) {
         case 'float':
-          output = `gl_FragColor = vec4( ${name} ) * _multiplier + _offset * _multiplier;`
+          output = `gl_FragColor = vec4( ${name} ) + _offset;`
           break
         case 'int':
-          output = `gl_FragColor = vec4( float( ${name} ) ) * _multiplier + _offset * _multiplier;`
+          output = `gl_FragColor = vec4( float( ${name} ) ) + _offset;`
           break
         case 'uint':
-          output = `gl_FragColor = vec4( float( ${name} ) ) * _multiplier + _offset * _multiplier;`
+          output = `gl_FragColor = vec4( float( ${name} ) ) + _offset;`
           break
         case 'bool':
-          output = `gl_FragColor = vec4( float( ${name} ) ) * _multiplier + _offset * _multiplier;`
+          output = `gl_FragColor = vec4( float( ${name} ) ) + _offset;`
           break
         case 'vec2':
-          output = `gl_FragColor = vec4( ${name}.xy, 0.0, 0.0 ) * _multiplier + _offset * _multiplier;`
+          output = `gl_FragColor = vec4( ${name}.xy, 0.0, 0.0 ) + _offset;`
           break
         case 'vec3':
-          output = `gl_FragColor = vec4( ${name}.xyz, 0.0 ) * _multiplier + _offset * _multiplier;`
+          output = `gl_FragColor = vec4( ${name}.xyz, 0.0 ) + _offset;`
           break
         case 'vec4':
-          output = `gl_FragColor = ${name} * _multiplier + _offset * _multiplier;`
+          output = `gl_FragColor = ${name} + _offset;`
           break
       }
     }
