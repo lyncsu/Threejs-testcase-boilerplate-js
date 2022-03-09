@@ -72,7 +72,7 @@ export class ShaderDebugMaterial extends ShaderMaterial {
     )
     this.fragmentShader = ShaderDebugUtil.splice(
       this.fragmentShader,
-      '\nvarying vec4 _varying_output;\nuniform float _multiplier;\nuniform float _offset\n;',
+      '\nvarying vec4 _varying_output;\nuniform float _offset\n;',
       ShaderDebugUtil.getMainExtents(this.fragmentShader).before
     )
 
@@ -208,7 +208,7 @@ export class ShaderDebugMaterial extends ShaderMaterial {
     this.fragmentShader = this.fragmentShader.replace(/gl_FragColor[^;=]*?=[^;]*;/g, ';')
     this.fragmentShader = ShaderDebugUtil.splice(
       this.fragmentShader,
-      '\nuniform float _multiplier;\nuniform float _offset;\n',
+      '\nuniform float _offset;\n',
       ShaderDebugUtil.getMainExtents(this.fragmentShader).before
     )
     this.fragmentShader = this.fragmentShader.replace(/gl\$FragColor/g, 'gl_FragColor')
