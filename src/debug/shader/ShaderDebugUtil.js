@@ -1,3 +1,5 @@
+import { ShaderChunk } from 'three'
+
 export default class ShaderDebugUtil {
   /**
    * 切割字符串
@@ -24,6 +26,7 @@ export default class ShaderDebugUtil {
 
     let lastResult = null
     while ((lastResult = regex.exec(text))) {
+      if (prefix === 'include') console.info('lastResult', lastResult)
       const type = lastResult[1]
       const name = lastResult[2]
       result.push({
@@ -46,7 +49,6 @@ export default class ShaderDebugUtil {
     const result = []
     const mainRegex = /void\s*main\s*\(.*?\)[\s\S]*\{/
     const startIndex = mainRegex.exec(text).index
-
     const braceRegex = /[{}]/g
     braceRegex.lastIndex = startIndex
 
@@ -64,19 +66,72 @@ export default class ShaderDebugUtil {
         for (let i = 0, l = result.length; i < l; i++) {
           result[i].scope = braceIndices.length
         }
-
         const content = text.substr(startIndex, endIndex)
         const replaced = content.replace(/[^\n]/g, ' ')
         text = this.splice(text, replaced, startIndex, endIndex - startIndex + 1)
       }
     }
 
-    // Sort the variables to be in line first order, character order next
+    // 按索引排序
     result.sort((a, b) => {
       return a.index - b.index
     })
 
-    // Find any local variables tha didn't have types found
+    // 找到无类型的局部变量
+    for (let i = 0, l = result.length; i < l; i++) {
+      const item = result[i]
+      if (item.type === null) {
+        const name = item.name
+        for (let j = i; j >= 0; j--) {
+          const otherItem = result[j]
+          if (otherItem.scope <= item.scope && otherItem.name === name && otherItem.type) {
+            item.type = otherItem.type
+            break
+          }
+        }
+      }
+    }
+
+    return result
+  }
+
+  /**
+   * 解析主函数之内的include命令
+   * @param {*} text
+   * @returns
+   */
+  static parseLocalIncludes(text) {
+    const result = []
+    const mainRegex = /void\s*main\s*\(.*?\)[\s\S]*\{/
+    const startIndex = mainRegex.exec(text).index
+    const braceRegex = /[{}]/g
+    braceRegex.lastIndex = startIndex
+
+    let lastResult = null
+    let braceIndices = [startIndex]
+    while ((lastResult = braceRegex.exec(text)) && braceIndices.length !== 0) {
+      const brace = lastResult[0]
+      if (brace === '{') {
+        braceIndices.push(lastResult.index)
+      } else {
+        const startIndex = braceIndices.pop()
+        const endIndex = lastResult.index
+        result.push(...this.parseDeclarations(text, startIndex, endIndex, true))
+        for (let i = 0, l = result.length; i < l; i++) {
+          result[i].scope = braceIndices.length
+        }
+
+        const content = text.substr(startIndex, endIndex)
+        const replaced = content.replace(/[^\n]/g, ' ')
+        text = this.splice(text, replaced, startIndex, endIndex - startIndex + 1)
+      }
+    }
+    // 按索引排序
+    result.sort((a, b) => {
+      return a.index - b.index
+    })
+
+    // 找到无类型的局部变量
     for (let i = 0, l = result.length; i < l; i++) {
       const item = result[i]
       if (item.type === null) {
@@ -101,35 +156,42 @@ export default class ShaderDebugUtil {
    * @param {*} endIndex
    * @returns
    */
-  static parseDeclarations(body, startIndex, endIndex) {
+  static parseDeclarations(body, startIndex, endIndex, includeParsingMode) {
     body = body.substr(0, endIndex)
 
     const result = []
-    const declarationRegex = /(vec[1234]|float|int|uint|bool)(.+)?;/g
+    const declarationRegex = includeParsingMode ? /#include(.+)?/g : /(vec[1234]|float|int|uint|bool)(.+)?;/g
     declarationRegex.lastIndex = startIndex
     let lastResult = null
     while ((lastResult = declarationRegex.exec(body))) {
       const line = lastResult[0]
-      const type = lastResult[1]
-      const rest = lastResult[2].replace(/\(.*?\)/g, '')
       const index = lastResult.index + line.length
 
-      const splits = rest.split(',')
-      for (let i = 0, l = splits.length; i < l; i++) {
-        const item = splits[i]
-        let name
-        if (/=/.test(item)) {
-          name = item.split('=')[0].trim()
-
-          result.push({
-            index,
-            type,
-            name,
-            prefix: null,
-          })
+      if (includeParsingMode) {
+        const name = lastResult[1].replace(/\(.*|<|>|^\s|.*?\)/g, '')
+        result.push({ index, name })
+      } else {
+        const type = lastResult[1].replace(/\(.*?\)/g, '')
+        const rest = lastResult[2].replace(/\(.*?\)/g, '')
+        const splits = rest.split(',')
+        for (let i = 0, l = splits.length; i < l; i++) {
+          const item = splits[i]
+          let name
+          if (/=/.test(item)) {
+            name = item.split('=')[0].trim()
+            if (name !== 'i')
+              result.push({
+                index,
+                type,
+                name,
+                prefix: null,
+              })
+          }
         }
       }
     }
+
+    if (includeParsingMode) return result
 
     const semiRegexp = /;/g
     const setRegexp = /(\w+?)\s*=\s*\w+?(;|,)/g
@@ -137,11 +199,10 @@ export default class ShaderDebugUtil {
     while ((lastResult = setRegexp.exec(body))) {
       const line = lastResult[0]
       const name = lastResult[1]
-
       semiRegexp.index = lastResult.index
       semiRegexp.exec(body)
-      const index = semiRegexp.index + line.length
 
+      const index = semiRegexp.index + line.length
       result.push({
         index,
         type: null,
@@ -150,7 +211,6 @@ export default class ShaderDebugUtil {
       })
     }
 
-    // remove duplicates
     for (let i = 0; i < result.length; i++) {
       const item = result[i]
       for (let j = i + 1; j < result.length; j++) {
@@ -256,6 +316,11 @@ export default class ShaderDebugUtil {
     const attributes = this.parseGlobals('attribute', text)
 
     // Locals
+    const includes = this.parseLocalIncludes(text)
+    // 替换includes
+    includes.forEach(include => {
+      text = text.replace(`#include <${include.name}>`, ShaderChunk[include.name])
+    })
     const localVariables = this.parseLocalVariables(text)
     const beforeMainIndex = matches.index
     const afterMainIndex = matches.index + matches[0].length
@@ -265,6 +330,24 @@ export default class ShaderDebugUtil {
       uniforms,
       attributes,
       localVariables,
+      includes,
     }
+  }
+
+  /**
+   * 替换main函数中的include
+   */
+  static replaceMainIncludes(text, includes) {
+    const mainRegex = /void\s*main\s*\(.*?\)[\s\S]*\{/
+    const result = mainRegex.exec(text)
+    const len = result[0].length
+    const startIndex = result.index
+    // 替换主函数内include
+    let mainFrag = text.substr(len + startIndex - 1, text.length)
+    // 将#include内容载入并切换为可调式
+    includes.forEach(include => {
+      mainFrag = mainFrag.replace(`#include <${include.name}>`, ShaderChunk[include.name])
+    })
+    return `${text.substr(0, startIndex + len - 1)}${mainFrag}`
   }
 }

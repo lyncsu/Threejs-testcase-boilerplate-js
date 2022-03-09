@@ -90,27 +90,31 @@ export class ShaderDebug {
   }
 
   /**
-   * 更新文字视窗
+   * 更新调试代码视窗
    */
   update() {
     if (!this.debugRenderer || !this.debugRenderer.debugMaterial) return
 
-    const { varyings, attributes, uniforms, localVariables } = this.debugMaterial.fragmentDefinitions
+    const { varyings, attributes, uniforms, localVariables, includes } = this.debugMaterial.fragmentDefinitions
     const variables = [...varyings, ...attributes, ...uniforms, ...localVariables]
     const replaceIndices = []
     const commentIndices = []
+
     let fragmentShader = this.debugMaterial.fragmentShader
+    // 除去注释
     fragmentShader = fragmentShader.replace(/\/\/(.*)?\n/g, function (match, content) {
       return '//' + content.replace(/./g, ' ') + '\n'
     })
+    fragmentShader = ShaderDebugUtil.replaceMainIncludes(fragmentShader, includes)
     variables.sort((a, b) => b.length - a.length)
     variables.forEach(v => {
       const name = v.name
       const type = v.type
       const prefix = v.prefix
-      const reg = new RegExp(`([^\\w<>"\\.])${name}([^\\w<>"])`, 'g')
+      const regex = new RegExp(`([^\\w<>"\\.])${name}([^\\w<>"])`, 'g')
+      // 查找变量所在的索引
       let lastResult
-      while ((lastResult = reg.exec(fragmentShader))) {
+      while ((lastResult = regex.exec(fragmentShader))) {
         const semiRegex = /;/g
         semiRegex.lastIndex = lastResult.index
         semiRegex.exec(fragmentShader)
@@ -127,6 +131,7 @@ export class ShaderDebug {
 
     let accumOffset = 0
     let resultShader = this.debugMaterial.fragmentShader
+    resultShader = ShaderDebugUtil.replaceMainIncludes(resultShader, includes)
     replaceIndices.sort((a, b) => a.before - b.before)
     replaceIndices.forEach(info => {
       const { name, type, prefix, before, after, insertIndex } = info
@@ -144,7 +149,6 @@ export class ShaderDebug {
         accumOffset += delta
       }
     })
-
     resultShader.replace(/<(\s+)>/, '&lt;$1&gt;')
 
     const mainRegex = /^([\s\S]*)?void(\s+)main/g

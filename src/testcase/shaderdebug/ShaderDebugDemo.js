@@ -53,6 +53,7 @@ export class ShaderDebugDemo extends Demo {
           newMaterial.extensions.shaderTextureLOD = true
           newMaterial.defines.TEXTURE_LOD_EXT = ''
           newMaterial.defines.USE_UV = ''
+          newMaterial.defines.USE_FOG = ''
           newMaterial.defines.USE_MAP = ''
           newMaterial.defines.USE_NORMALMAP = ''
           newMaterial.defines.USE_AOMAP = ''

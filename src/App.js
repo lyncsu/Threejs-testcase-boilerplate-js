@@ -59,7 +59,9 @@ export class App {
     textureCube.encoding = THREE.sRGBEncoding
     this.textureCube = textureCube
     this.scene.background = textureCube
+    this.scene.fog = new THREE.Fog(0xff0000, 0.1, 100)
 
+    // this.scene.fog = new THREE.FogExp2(0xffffff, 1)
     // const floor = new THREE.Mesh(new THREE.PlaneBufferGeometry(), new THREE.ShadowMaterial({ side: 2, transparent: true, opacity: 0.25 }))
     // floor.scale.set(10, 10, 10)
     // floor.position.set(0, -1, 0)

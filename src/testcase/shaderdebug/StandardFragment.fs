@@ -80,78 +80,16 @@ varying vec3 vViewPosition;
 
 void main() {
 
-	#if NUM_CLIPPING_PLANES > 0
-
-    vec4 plane;
-
-    #pragma unroll_loop_start
-    for ( int i = 0; i < UNION_CLIPPING_PLANES; i ++ ) {
-
-      plane = clippingPlanes[ i ];
-      if ( dot( vClipPosition, plane.xyz ) > plane.w ) discard;
-
-    }
-    #pragma unroll_loop_end
-
-    #if UNION_CLIPPING_PLANES < NUM_CLIPPING_PLANES
-
-      bool clipped = true;
-
-      #pragma unroll_loop_start
-      for ( int i = UNION_CLIPPING_PLANES; i < NUM_CLIPPING_PLANES; i ++ ) {
-
-        plane = clippingPlanes[ i ];
-        clipped = ( dot( vClipPosition, plane.xyz ) > plane.w ) && clipped;
-
-      }
-      #pragma unroll_loop_end
-
-      if ( clipped ) discard;
-
-    #endif
-
-  #endif
+	#include <clipping_planes_fragment>
 
 	vec4 diffuseColor = vec4( diffuse, opacity );
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 	vec3 totalEmissiveRadiance = emissive;
 
-	#if defined( USE_LOGDEPTHBUF ) && defined( USE_LOGDEPTHBUF_EXT )
-
-    // Doing a strict comparison with == 1.0 can cause noise artifacts
-    // on some platforms. See issue #17623.
-    gl_FragDepthEXT = vIsPerspective == 0.0 ? gl_FragCoord.z : log2( vFragDepth ) * logDepthBufFC * 0.5;
-
-  #endif
-	#ifdef USE_MAP
-
-    vec4 sampledDiffuseColor = texture2D( map, vUv );
-
-    #ifdef DECODE_VIDEO_TEXTURE
-
-      // inline sRGB decode (TODO: Remove this code when https://crbug.com/1256340 is solved)
-
-      sampledDiffuseColor = vec4( mix( pow( sampledDiffuseColor.rgb * 0.9478672986 + vec3( 0.0521327014 ), vec3( 2.4 ) ), sampledDiffuseColor.rgb * 0.0773993808, vec3( lessThanEqual( sampledDiffuseColor.rgb, vec3( 0.04045 ) ) ) ), sampledDiffuseColor.w );
-
-    #endif
-
-    diffuseColor *= sampledDiffuseColor;
-
-  #endif
-	#if defined( USE_COLOR_ALPHA )
-
-    diffuseColor *= vColor;
-
-  #elif defined( USE_COLOR )
-
-    diffuseColor.rgb *= vColor;
-
-  #endif
-	#ifdef USE_ALPHAMAP
-
-    diffuseColor.a *= texture2D( alphaMap, vUv ).g;
-
-  #endif
+	#include <logdepthbuf_fragment>
+	#include <map_fragment>
+	#include <color_fragment>
+	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <roughnessmap_fragment>
 	#include <metalnessmap_fragment>
