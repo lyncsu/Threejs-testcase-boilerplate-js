@@ -318,9 +318,10 @@ export default class ShaderDebugUtil {
     // Locals
     const includes = this.parseLocalIncludes(text)
     // 替换includes
-    includes.forEach(include => {
-      text = text.replace(`#include <${include.name}>`, ShaderChunk[include.name])
-    })
+    includes &&
+      includes.forEach(include => {
+        text = text.replace(`#include <${include.name}>`, ShaderChunk[include.name])
+      })
     const localVariables = this.parseLocalVariables(text)
     const beforeMainIndex = matches.index
     const afterMainIndex = matches.index + matches[0].length
@@ -344,10 +345,12 @@ export default class ShaderDebugUtil {
     const startIndex = result.index
     // 替换主函数内include
     let mainFrag = text.substr(len + startIndex - 1, text.length)
+
     // 将#include内容载入并切换为可调式
-    includes.forEach(include => {
-      mainFrag = mainFrag.replace(`#include <${include.name}>`, ShaderChunk[include.name])
-    })
+    includes &&
+      includes.forEach(include => {
+        mainFrag = mainFrag.replace(`#include <${include.name}>`, ShaderChunk[include.name])
+      })
     return `${text.substr(0, startIndex + len - 1)}${mainFrag}`
   }
 }

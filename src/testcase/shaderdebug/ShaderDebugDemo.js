@@ -5,6 +5,7 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 import { Demo } from '../base/Demo'
 import * as FragementShader from './StandardFragment.fs'
 import { ShaderDebugMaterial } from '../../debug/shader/ShaderDebugMaterial'
+import ShaderDebugUtil from '../../debug/shader/ShaderDebugUtil'
 
 /**
  * Shader调试Demo用例
@@ -45,7 +46,7 @@ export class ShaderDebugDemo extends Demo {
           newMaterial.uniforms.envMap.value = envMap
           newMaterial.uniforms.flipEnvMap.value = 1
           newMaterial.uniforms.envMapIntensity.value = 0.25
-          newMaterial.fragmentShader = FragementShader
+          newMaterial.fragmentShader = ShaderDebugUtil.replaceMainIncludes(FragementShader)
           newMaterial.uniforms.emissive.value.copy(originalMaterial.emissive)
           newMaterial.uniforms.diffuse.value.copy(originalMaterial.color)
           newMaterial.lights = true
@@ -71,7 +72,6 @@ export class ShaderDebugDemo extends Demo {
           debugMaterial = new ShaderDebugMaterial(newMaterial)
           this.app.renderer.debugMaterial = debugMaterial
 
-          console.info(debugMaterial)
           child.castShadow = true
           child.receiveShadow = true
         }

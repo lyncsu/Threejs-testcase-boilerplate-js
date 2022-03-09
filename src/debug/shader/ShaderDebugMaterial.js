@@ -212,7 +212,6 @@ export class ShaderDebugMaterial extends ShaderMaterial {
     }
 
     result = result.replace(/gl_FragColor/g, 'gl$FragColor')
-    console.info(this.fragmentShader)
     this.fragmentShader = ShaderDebugUtil.replaceMainIncludes(this.fragmentShader, this.fragmentDefinitions.includes)
     this.fragmentShader = ShaderDebugUtil.splice(this.fragmentShader, result, index)
     this.fragmentShader = this.fragmentShader.replace(/gl_FragColor[^;=]*?=[^;]*;/g, ';')
