@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
-    "shader":"webpack-dev-server --inline --progress --config build/webpack.shader.conf.js",
+    "shader": "webpack-dev-server --inline --progress --config build/webpack.shader.conf.js",
     "test": "jest"
   },
   "author": "Lync Su",

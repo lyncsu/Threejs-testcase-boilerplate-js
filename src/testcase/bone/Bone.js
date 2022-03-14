@@ -8,22 +8,25 @@ export class Bone extends THREE.Object3D {
    * 是否为根节点
    */
   isRoot
+
   /**
    * 是否显示辅助线
    */
   isShowHelper
+
   /**
    * 骨骼矩阵
    */
   boneMatrix
 
+  /**
+   * 父级节点
+   */
+  parentBone
+
   get rootBone() {
     if (this.isRoot) return this._rootBone
     return this.findRoot()
-  }
-
-  get parentBone() {
-    return
   }
 
   constructor(length, isShowHelper = true, isRoot) {
@@ -72,6 +75,7 @@ export class Bone extends THREE.Object3D {
   addChild(bone) {
     bone.setBoneMatrix(this.boneMatrix)
     bone.boneId = ++this.rootBone.count
+    bone.parentBone = this
     this.rootBone.add(bone)
   }
 
