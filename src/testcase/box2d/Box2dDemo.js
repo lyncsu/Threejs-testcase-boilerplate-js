@@ -107,7 +107,7 @@ export class Box2dDemo extends Demo {
       })
 
       const shape = new b2PolygonShape()
-      shape.SetAsBox(0.5, 4, new b2Vec2(4, 0), 0.5 * Math.PI)
+      shape.SetAsBox(0.5, 4, new b2Vec2(0, 0), 0.5 * Math.PI)
 
       this.platform.CreateFixture({
         shape,
@@ -150,7 +150,7 @@ export class Box2dDemo extends Demo {
     {
       const box = this.world.CreateBody({
         type: b2BodyType.b2_dynamicBody,
-        position: { x: 0, y: 8 },
+        position: { x: -2, y: 8 },
       })
 
       const shape = new b2PolygonShape()

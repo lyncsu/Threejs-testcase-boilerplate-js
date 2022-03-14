@@ -7,6 +7,7 @@ import Stats from './util/stats/Stats'
 import { Composer } from './postprocessing/Composer'
 import { ShaderDebugRenderer } from './debug/shader/ShaderDebugRenerer'
 import { ShaderDebug } from './debug/shader/ShaderDebug'
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 
 export class App {
   constructor(domElement, shaderDebugMode) {
@@ -30,10 +31,10 @@ export class App {
     this.bindScope()
     this.initClock()
     this.initEventListener()
-    this.initScene()
-    this.initCamera()
     if (this.isShaderDebugMode) this.shaderDebug = new ShaderDebug()
     this.initRenderer(this.isShaderDebugMode)
+    this.initScene()
+    this.initCamera()
     this.initComposer()
     this.intTestcase()
     this.initOrbit()
@@ -53,12 +54,12 @@ export class App {
   initScene() {
     this.scene = new THREE.Scene()
 
-    const cubeLoader = new THREE.CubeTextureLoader()
-    cubeLoader.setPath(`${Constant.STATIC_ASSETS_PATH}env/`)
-    const textureCube = cubeLoader.load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'])
-    textureCube.encoding = THREE.sRGBEncoding
-    this.textureCube = textureCube
-    this.scene.background = textureCube
+    // const cubeLoader = new THREE.CubeTextureLoader()
+    // cubeLoader.setPath(`${Constant.STATIC_ASSETS_PATH}env/`)
+    // const textureCube = cubeLoader.load(['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'])
+    // textureCube.encoding = THREE.sRGBEncoding
+    // this.textureCube = textureCube
+    // this.scene.background = textureCube
     this.scene.fog = new THREE.Fog(0x000000, 0.1, 100)
 
     // this.scene.fog = new THREE.FogExp2(0xffffff, 1)
@@ -92,6 +93,16 @@ export class App {
 
     const grid = new THREE.GridHelper(15, 30)
     this.scene.add(grid)
+
+    // env
+    const pmremGenerator = new THREE.PMREMGenerator(this.renderer)
+    pmremGenerator.compileEquirectangularShader()
+    new RGBELoader().setPath('./static/assets/image/hdr/').load('keyshot_startup.hdr', async texture => {
+      const envMap = pmremGenerator.fromEquirectangular(texture).texture
+      this.scene.background = envMap
+      texture.dispose()
+      pmremGenerator.dispose()
+    })
   }
 
   initRenderer(shaderDebugMode) {

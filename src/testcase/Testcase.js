@@ -4,6 +4,7 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 import Stats from '../util/stats/Stats'
 import { ShaderDebugDemo } from './shaderdebug/ShaderDebugDemo'
 import { Box2dDemo } from './box2d/Box2dDemo'
+import { BoneDemo } from './bone/BoneDemo'
 
 /**
  * 测试用例类
@@ -31,7 +32,8 @@ export class Testcase {
     Stats.register(this.app.renderer)
     // this.rain = new RainDemo(this.app)
     // this.draco = new DracoDemo(this.app)
-    this.box2d = new Box2dDemo(this.app)
+    // this.box2d = new Box2dDemo(this.app)
+    this.bone = new BoneDemo(this.app)
     if (this.app.isShaderDebugMode) this.shaderDebug = new ShaderDebugDemo(this.app)
   }
 
@@ -46,5 +48,6 @@ export class Testcase {
       // if (rainFallGeometry) this.fallDisplay.setValue(BufferGeometryUtils.estimateBytesUsed(rainFallGeometry) + ' bytes')
     }
     if (this.box2d) this.box2d.update()
+    if (this.bone) this.bone.update()
   }
 }
