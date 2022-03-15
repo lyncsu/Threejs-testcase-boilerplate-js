@@ -17,16 +17,17 @@ export class BoneDemo extends Demo {
   bindScope() {}
 
   init() {
-    const rootBone = new Bone(null, true, true)
+    const num = 2
+    const max = 2
+    const min = 1
+    const step = (max - min) / (num - 1)
+    const rootBone = new Bone(max + step, true, true)
     this.app.scene.add(rootBone)
     this.rootBone = rootBone
 
     let parentBone = rootBone
-    const num = 4
-    const max = 2
-    const min = 1
     for (let i = 0; i < num; i++) {
-      const len = max - (isNaN(((max - min) / (num - 1)) * i) ? 0 : ((max - min) / (num - 1)) * i)
+      const len = max - (isNaN(step * i) ? 0 : step * i)
       const child = new Bone(len)
       parentBone.addChild(child)
       parentBone = child
@@ -39,9 +40,7 @@ export class BoneDemo extends Demo {
     this.rootBone.rotation.z = (Math.sin(time) * Math.PI) / 4
     // this.rootBone.rotation.y = Math.cos(-time) * Math.PI
     this.rootBone.children.forEach(bone => {
-      if (bone instanceof Bone) {
-        bone.iterate()
-      }
+      if (bone instanceof Bone) bone.iterate()
     })
   }
 }
