@@ -67,7 +67,7 @@ export class Bone extends THREE.Object3D {
     }
     this.matrixAutoUpdate = this.isRoot
     const endPosition = new THREE.Vector3().copy(this.position).add(new THREE.Vector3(0, this.length, 0))
-    this.boneMatrix = this.isRoot ? this.matrix : new THREE.Matrix4().setPosition(endPosition)
+    this.boneMatrix = this.isRoot ? new THREE.Matrix4() : new THREE.Matrix4().setPosition(endPosition)
     console.info(this.boneMatrix.toArray())
     if (this.isShowHelper) this.#createBoneHelper()
   }
@@ -112,34 +112,58 @@ export class Bone extends THREE.Object3D {
     if (this.boneId < 2) return
 
     const rootBoneMatrix = this.rootBone.matrix
-    console.info('rootBoneMatrix', rootBoneMatrix.toArray())
+    // console.info('rootBoneMatrix', rootBoneMatrix.toArray())
     const rootBoneInvMatrix = new THREE.Matrix4().copy(rootBoneMatrix)
-
-    const boneMatrix = this.parentBone.matrix
+    const boneMatrix = this.parentBone.boneMatrix
     const boneInvMatrix = new THREE.Matrix4().copy(this.parentBone.matrix).invert()
-    const bonePosition = MathUtil.getMatrixPosition(this.parentBone.boneMatrix)
-    // const boneInvPosition = new THREE.Vector3().copy(bonePosition).negate()
     const parentPosition = new THREE.Vector3()
     const parentQuaternion = new THREE.Quaternion()
     const position = new THREE.Vector3()
     const quaternion = new THREE.Quaternion()
     const scale = new THREE.Vector3()
     const parentMatrix = new THREE.Matrix4().copy(this.parentBone.matrix)
+    const targetPosition = new THREE.Vector3().applyMatrix4(boneMatrix)
+
+    console.info(targetPosition)
+    // 使用的是root的旋转
     if (this.boneId === 2) {
       rootBoneMatrix.decompose(position, parentQuaternion, scale)
       parentMatrix.decompose(parentPosition, quaternion, scale)
-      this.position.copy(bonePosition)
-      this.quaternion.copy(parentQuaternion)
+      //.applyQuaternion(parentQuaternion).applyMatrix4(boneMatrix)
     } else {
-      // const parentInvMatrix = new THREE.Matrix4().copy(parentMatrix).invert()
+      parentMatrix.multiply(rootBoneInvMatrix)
       parentMatrix.decompose(parentPosition, parentQuaternion, scale)
-
-      bonePosition.applyMatrix4(boneInvMatrix).applyQuaternion(parentQuaternion).applyMatrix4(boneMatrix)
-      this.position.copy(bonePosition)
-      this.quaternion.copy(parentQuaternion)
     }
 
-    console.info('boneId', this.boneId, bonePosition, '----------------', parentPosition, parentQuaternion, quaternion)
+    this.position.copy(targetPosition)
+    // const quaternionInv = new THREE.Quaternion().copy(parentQuaternion).invert()
+    // this.quaternion.slerp(parentQuaternion, 0.1)
+    this.quaternion.copy(parentQuaternion)
+    // } else {
+    // const parentInvMatrix = new THREE.Matrix4().copy(parentMatrix).invert()
+    // parentMatrix.decompose(parentPosition, parentQuaternion, scale)
+    // const targetPosition = new THREE.Vector3()
+    //   .copy(bonePosition)
+    //   .applyMatrix4(boneInvMatrix)
+    //   .applyQuaternion(parentQuaternion)
+    //   .applyMatrix4(boneMatrix)
+    // this.position.copy(targetPosition)
+    // const quaternionInv = new THREE.Quaternion().copy(parentQuaternion).invert()
+    // this.quaternion.slerp(parentQuaternion, 0.1)
+    // this.quaternion.copy(parentQuaternion)
+    // }
+
+    console.info(
+      'boneId',
+      this.boneId,
+      'bonePosition',
+      MathUtil.getMatrixPosition(boneMatrix),
+      'parentPosition',
+      parentPosition,
+      'parentQuaternion',
+      parentQuaternion
+    )
+    console.info('\t    ', 'position', this.position, 'quaternion', this.quaternion)
 
     // bonePosition.applyMatrix4(boneInvMatrix).applyQuaternion(parentQuaternion).applyMatrix4(boneMatrix)
 

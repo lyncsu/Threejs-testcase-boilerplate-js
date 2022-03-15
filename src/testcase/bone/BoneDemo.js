@@ -22,7 +22,7 @@ export class BoneDemo extends Demo {
     this.rootBone = rootBone
 
     let parentBone = rootBone
-    const num = 3
+    const num = 4
     const max = 2
     const min = 1
     for (let i = 0; i < num; i++) {
