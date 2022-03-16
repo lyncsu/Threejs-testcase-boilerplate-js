@@ -17,9 +17,9 @@ export class BoneDemo extends Demo {
   bindScope() {}
 
   init() {
-    const num = 2
+    const num = 5
     const max = 2
-    const min = 1
+    const min = 0.5
     const step = (max - min) / (num - 1)
     const rootBone = new Bone(max + step, true, true)
     this.app.scene.add(rootBone)
