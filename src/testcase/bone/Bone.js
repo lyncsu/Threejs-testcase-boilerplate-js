@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { MathUtils } from 'three'
 import MathUtil from '../../util/MathUtil'
 
 /**
@@ -46,6 +47,11 @@ export class Bone extends THREE.Object3D {
   get rootBone() {
     if (this.isRoot) return this.#rootBone
     return this.findRoot()
+  }
+
+  get parentRotationZ() {
+    if (this.isRoot) return this.rotation.z
+    return this.parentBone.rotation.z
   }
 
   /**
@@ -115,18 +121,35 @@ export class Bone extends THREE.Object3D {
     const bonePosition = MathUtil.getMatrixPosition(this.parentBone.boneMatrix)
     if (this.boneId < 2) this.position.copy(bonePosition)
     else this.position.copy(bonePosition).applyMatrix4(rotationMatrix).add(parentPosition)
-    const targetQuaternion = new THREE.Quaternion().setFromRotationMatrix(rotationMatrix)
+    const boneDirection = new THREE.Vector3(0, this.length, 0)
     const direction = new THREE.Vector3().copy(this.position).sub(parentPosition).normalize()
-    const helper = new THREE.ArrowHelper(direction, this.position)
-    helper.uuid = this.boneId + '_' + 1
-
+    const n = new THREE.Vector3().copy(direction)
+    const axis = new THREE.Vector3(0, 0, 1)
+    const resistanceDirection = new THREE.Vector3().crossVectors(n, axis)
+    // const clamped = MathUtils.clamp(this.parentBone.parentRotationZ, -Math.PI, 0)
+    resistanceDirection.setScalar(this.parentBone.parentRotationZ)
+    const targetDirection = new THREE.Vector3().copy(direction).add(resistanceDirection)
+    const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(direction, targetDirection)
+    const helperTarget = direction
     let hasHelper = false
     this.rootBone.children.forEach(child => {
       if (child instanceof THREE.ArrowHelper) {
-        if (child.uuid === helper.uuid) hasHelper = true
+        if (child.uuid === this.boneId) {
+          hasHelper = true
+          child.setDirection(helperTarget)
+          child.position.copy(this.position)
+          // child.setLength(resistanceDirection.length())
+        }
       }
     })
-    if (!hasHelper) this.rootBone.add(helper)
+    if (!hasHelper) {
+      // dir helper
+      const helper = new THREE.ArrowHelper(direction, this.position)
+      helper.uuid = this.boneId
+      this.rootBone.add(helper)
+    }
+
+    this.quaternion.copy(targetQuaternion)
     this.updateMatrix()
 
     console.info('boneId', this.boneId, 'bonePosition', bonePosition, 'parentPosition', parentPosition)
