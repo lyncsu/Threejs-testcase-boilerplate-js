@@ -34,7 +34,12 @@ export class Bone extends THREE.Object3D {
   /**
    * 迭代次数
    */
-  maxIteration = 10
+  recursive = 1
+
+  /**
+   * 延迟响应
+   */
+  delay = 5
 
   /**
    * 根节点
@@ -123,11 +128,14 @@ export class Bone extends THREE.Object3D {
     const direction = new THREE.Vector3().copy(offset).normalize()
     const axis = new THREE.Vector3(0, 0, -1).normalize()
     const resistanceDirection = new THREE.Vector3().crossVectors(direction, axis).normalize()
-    const resistanceVector = new THREE.Vector3().copy(resistanceDirection).setLength(this.parentBone.parentRotationZ)
+    const targetRotation = MathUtils.clamp(-this.rootBone.parentRotationZ * (this.boneId / this.rootBone.count), -Math.PI / 4, Math.PI / 4)
+    const resistanceVector = new THREE.Vector3().copy(resistanceDirection).setLength(targetRotation)
     const targetVector = new THREE.Vector3().addVectors(offset, resistanceVector)
     const targetDirection = new THREE.Vector3().copy(targetVector).normalize()
     const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(direction, targetDirection)
     const quaternion = new THREE.Quaternion().slerp(targetQuaternion, 1)
+
+    this.delay
 
     if (this.boneId < 2) {
       this.position.copy(bonePosition)
@@ -158,9 +166,9 @@ export class Bone extends THREE.Object3D {
       this.rootBone.add(helper)
     }
 
-    console.info('boneId', this.boneId, 'bonePosition', bonePosition, 'parentPosition', parentPosition)
-    console.info('\t    ', 'position', this.position, 'quaternion', this.quaternion)
-    console.info('\t    ', 'rotationMatrix', rotationMatrix.toArray())
+    // console.info('boneId', this.boneId, 'bonePosition', bonePosition, 'parentPosition', parentPosition)
+    // console.info('\t    ', 'position', this.position, 'quaternion', this.quaternion)
+    // console.info('\t    ', 'rotationMatrix', rotationMatrix.toArray())
   }
 
   /**

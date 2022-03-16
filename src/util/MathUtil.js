@@ -11,4 +11,13 @@ export default class MathUtil {
     const elements = matrix4.elements
     return new Vector3(elements[12], elements[13], elements[14])
   }
+
+  /**
+   * 获取正负
+   */
+  static sign(n) {
+    if (isNaN(n)) return 1
+    if (n >= 0) return 1
+    else return -1
+  }
 }
