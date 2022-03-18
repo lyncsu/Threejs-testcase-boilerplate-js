@@ -32,25 +32,42 @@ export class Bone extends THREE.Object3D {
   parentBone
 
   /**
-   * 迭代次数
+   * 每一级的幅度迭代次数
    */
-  recursive = 1
+  recursion = 3
+
+  /**
+   * 拉伸幅度
+   */
+  strength = 5
 
   /**
    * 延迟响应
    */
-  delay = 5
+  delay = 2
 
   /**
-   * 根节点
+   * 实现delay的递归次数
    */
-  #rootBone
+  iteration
+
+  /**
+   * 迭代初始化完成状态
+   */
+  #ready
+
+  /**
+   * 衰减度
+   */
+  #attenuation
+
+  #finished
 
   /**
    * 获取根节点
    */
   get rootBone() {
-    if (this.isRoot) return this.#rootBone
+    if (this.isRoot) return this
     return this.findRoot()
   }
 
@@ -72,13 +89,16 @@ export class Bone extends THREE.Object3D {
     this.isShowHelper = Boolean(isShowHelper)
     this.isRoot = Boolean(isRoot)
     if (this.isRoot) {
-      this.boneId = -1
+      this.boneId = 0
       this.count = 0
-      this.#rootBone = this
     }
     this.matrixAutoUpdate = this.isRoot
     const endPosition = new THREE.Vector3(0, this.length, 0)
     this.boneMatrix = new THREE.Matrix4().setPosition(endPosition)
+    this.iteration = 0
+    this.#ready = false
+    this.#finished = false
+    this.delay *= 100
     if (this.isShowHelper) this.#createBoneHelper()
   }
 
@@ -113,39 +133,40 @@ export class Bone extends THREE.Object3D {
   }
 
   /**
-   * 迭代旋转
+   * 迭代旋转（从第二节开始迭代）
    */
   iterate() {
-    if (!this.parentBone) return
+    if (!this.#ready) this.#prepare()
 
-    const rotationMatrix = new THREE.Matrix4().extractRotation(this.parentBone.matrix)
-    const parentPosition = new THREE.Vector3()
-    const parentQuaternion = new THREE.Quaternion()
-    const scale = new THREE.Vector3()
-    this.parentBone.matrix.decompose(parentPosition, parentQuaternion, scale)
+    const allow = this.#check()
+    const { parentPosition, rotationMatrix } = this.#decomposeParentBone()
     const bonePosition = MathUtil.getMatrixPosition(this.parentBone.boneMatrix)
     const offset = new THREE.Vector3().copy(this.position).sub(parentPosition)
     const direction = new THREE.Vector3().copy(offset).normalize()
     const axis = new THREE.Vector3(0, 0, -1).normalize()
     const resistanceDirection = new THREE.Vector3().crossVectors(direction, axis).normalize()
-    const targetRotation = MathUtils.clamp(-this.rootBone.parentRotationZ * (this.boneId / this.rootBone.count), -Math.PI / 4, Math.PI / 4)
+    const rootRotation = -this.rootBone.parentRotationZ * this.strength
+    const p = Math.min(this.iteration, this.delay) / this.delay
+    const targetRotation = MathUtils.clamp(rootRotation * p * this.#attenuation, -Math.PI / 3, Math.PI / 3)
     const resistanceVector = new THREE.Vector3().copy(resistanceDirection).setLength(targetRotation)
     const targetVector = new THREE.Vector3().addVectors(offset, resistanceVector)
     const targetDirection = new THREE.Vector3().copy(targetVector).normalize()
     const targetQuaternion = new THREE.Quaternion().setFromUnitVectors(direction, targetDirection)
     const quaternion = new THREE.Quaternion().slerp(targetQuaternion, 1)
 
-    this.delay
-
+    this.position.copy(bonePosition)
     if (this.boneId < 2) {
-      this.position.copy(bonePosition)
       this.quaternion.copy(quaternion)
     } else {
-      this.position.copy(bonePosition).applyMatrix4(rotationMatrix).add(parentPosition)
+      this.position.applyMatrix4(rotationMatrix).add(parentPosition)
       this.quaternion.setFromRotationMatrix(rotationMatrix).multiply(quaternion)
     }
-
     this.updateMatrix()
+
+    if (allow) {
+      if (this.iteration < this.delay) this.iteration++
+      else this.#finished = true
+    }
 
     const helperTarget = targetDirection
     let hasHelper = false
@@ -160,15 +181,51 @@ export class Bone extends THREE.Object3D {
       }
     })
     if (!hasHelper) {
-      // dir helper
       const helper = new THREE.ArrowHelper(helperTarget, this.position, helperTarget.length(), 0x00ff00)
       helper.uuid = this.boneId
       this.rootBone.add(helper)
     }
 
-    // console.info('boneId', this.boneId, 'bonePosition', bonePosition, 'parentPosition', parentPosition)
-    // console.info('\t    ', 'position', this.position, 'quaternion', this.quaternion)
-    // console.info('\t    ', 'rotationMatrix', rotationMatrix.toArray())
+    // console.info('boneId', this.boneId, 'iteration', this.iteration)
+  }
+
+  /**
+   * 准备衰减参数
+   */
+  #prepare() {
+    this.#attenuation = Math.pow(Math.min(this.recursion, this.rootBone.count) / this.rootBone.count, this.boneId)
+    this.#ready = true
+  }
+
+  /**
+   * 检查是否结束
+   */
+  #check() {
+    // 检测是否结束后重启，重启则可放行
+    if (this.#finished) {
+      // 当再次转动，则重启迭代
+      if (!this.rotation.equals(this.rootBone.rotation)) {
+        this.iteration = 0
+        this.#finished = false
+        return true
+      }
+      return false
+    }
+    return true
+  }
+
+  /**
+   * 解构父级
+   * @returns
+   */
+  #decomposeParentBone() {
+    const parentPosition = new THREE.Vector3()
+    const parentQuaternion = new THREE.Quaternion()
+    const parentScale = new THREE.Vector3()
+    this.parentBone.matrix.decompose(parentPosition, parentQuaternion, parentScale)
+    const rotationMatrix = new THREE.Matrix4().extractRotation(this.parentBone.matrix)
+
+    return { parentPosition, parentQuaternion, parentScale, rotationMatrix }
   }
 
   /**

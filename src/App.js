@@ -43,7 +43,7 @@ export class App {
 
   initCamera() {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000)
-    this.camera.position.set(0, 10, 18)
+    this.camera.position.set(0, 2, 18)
     this.camera.target = new THREE.Vector3()
   }
 

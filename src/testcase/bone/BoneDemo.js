@@ -35,12 +35,10 @@ export class BoneDemo extends Demo {
       parentBone = child
     }
 
-    // gsap.to(this.rootBone.rotation, { z: Math.PI / 2, duration: 1, yoyo: true, repeat: -1 })
-
     gsap.to(tweenObject, {
       repeat: -1,
       repeatDelay: 3,
-      duration: 2,
+      duration: 3,
       keyframes: {
         ease: 'none',
         // easeEach: 'power1',
@@ -50,7 +48,7 @@ export class BoneDemo extends Demo {
   }
 
   update() {
-    const z = (tweenObject.t * Math.PI) / 4
+    const z = (tweenObject.t * Math.PI) / 3
 
     this.rootBone.rotation.z = z
     this.rootBone.children.forEach(bone => {
