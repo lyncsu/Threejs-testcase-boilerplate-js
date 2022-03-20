@@ -1,7 +1,6 @@
 import { Demo } from '../base/Demo'
 import { Bone } from './Bone'
 import gsap from 'gsap'
-import { Quad } from 'gsap'
 
 const tweenObject = { t: 0 }
 /**
@@ -19,11 +18,11 @@ export class BoneDemo extends Demo {
   bindScope() {}
 
   init() {
-    const num = 8
+    const num = 1
     const max = 1
     const min = 0.5
     const step = (max - min) / (num - 1)
-    const rootBone = new Bone(max + step, true, true)
+    const rootBone = new Bone(2, true, true)
     this.app.scene.add(rootBone)
     this.rootBone = rootBone
 
@@ -51,8 +50,9 @@ export class BoneDemo extends Demo {
     const z = (tweenObject.t * Math.PI) / 3
 
     this.rootBone.rotation.z = z
-    this.rootBone.children.forEach(bone => {
-      if (bone instanceof Bone) bone.iterate()
-    })
+    this.rootBone.iterate()
+    // this.rootBone.children.forEach(bone => {
+    //   if (bone instanceof Bone) bone.iterate()
+    // })
   }
 }
