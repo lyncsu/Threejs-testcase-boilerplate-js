@@ -145,7 +145,7 @@ export class Bone extends THREE.Object3D {
     if (this.boneId === 0) return this.childBone && this.childBone.iterate()
 
     // phase1
-    const parentBoneMatrix = new THREE.Matrix4().setPosition(this.parentBone.boneLength).multiply(this.parentBone.matrix)
+    const parentBoneMatrix = new THREE.Matrix4().setPosition(this.parentBone.boneLength).multiply(this.parentBone.matrixWorld)
     const prevMatrix = new THREE.Matrix4().copy(this.prevMatrix)
     const nextMatrix = new THREE.Matrix4().copy(this.prevMatrix)
     const bonePosition = MathUtil.extractPosition(parentBoneMatrix)
@@ -175,7 +175,7 @@ export class Bone extends THREE.Object3D {
     nextMatrix.makeRotationAxis(axis, roll).setPosition(bonePosition)
 
     // phase3
-    const boneMatrix = new THREE.Matrix4().multiply(this.matrix).setPosition(this.boneLength)
+    const boneMatrix = new THREE.Matrix4().multiply(this.matrixWorld).setPosition(this.parentBone.boneLength)
     const childBonePosition = MathUtil.extractPosition(boneMatrix)
     // const directionY = new THREE.Vector3().subVectors(childBonePosition, bonePosition).normalize()
     // const nextDirectionY = MathUtil.extractDirection(nextMatrix, 'y')
@@ -191,24 +191,25 @@ export class Bone extends THREE.Object3D {
     // const directionX = new THREE.Vector3().crossVectors(directionY, nextDirectionZ).normalize()
     // const directionZ = new THREE.Vector3().crossVectors(directionX, directionY).normalize()
     // const matrix3 = MathUtil.composeMatrix3ByAxis(directionX, directionY, directionZ)
-    // nextMatrix.identity().setFromMatrix3(matrix3).setPosition(bonePosition)
+    nextMatrix.setPosition(childBonePosition)
 
     // record
     // this.prevMatrix.copy(nextMatrix)
     const { position, quaternion } = MathUtil.decompose(nextMatrix)
     this.position.copy(position)
     this.quaternion.copy(quaternion)
+    this.updateMatrix()
 
     // next iterate
     if (this.childBone) this.childBone.iterate()
 
     // debug
-    if (this.boneId === 1) {
-      console.info('boneId', this.boneId, roll)
+    if (this.boneId === 2) {
+      console.info('boneId', this.boneId, this.parentBone.matrixWorld)
 
-      const helperTarget = checkDirection
-      this.#createDirectionHelper(helperTarget)
-      // this.#createPositionHelper(helperTarget)
+      const helperTarget = bonePosition
+      // this.#createDirectionHelper(helperTarget)
+      this.#createPositionHelper(helperTarget)
     }
   }
 
