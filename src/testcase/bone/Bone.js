@@ -145,7 +145,7 @@ export class Bone extends THREE.Object3D {
     if (this.boneId === 0) return this.childBone && this.childBone.iterate()
 
     // phase1
-    const parentBoneMatrix = new THREE.Matrix4().setPosition(this.parentBone.boneLength).multiply(this.parentBone.matrixWorld)
+    const parentBoneMatrix = new THREE.Matrix4().setPosition(this.parentBone.boneLength).multiply(this.parentBone.matrix)
     const prevMatrix = new THREE.Matrix4().copy(this.prevMatrix)
     const nextMatrix = new THREE.Matrix4().copy(this.prevMatrix)
     const bonePosition = MathUtil.extractPosition(parentBoneMatrix)
@@ -175,8 +175,9 @@ export class Bone extends THREE.Object3D {
     nextMatrix.makeRotationAxis(axis, roll).setPosition(bonePosition)
 
     // phase3
-    const boneMatrix = new THREE.Matrix4().multiply(this.matrixWorld).setPosition(this.parentBone.boneLength)
-    const childBonePosition = MathUtil.extractPosition(boneMatrix)
+    const nextBonePosition = new THREE.Vector3()
+      .copy(this.parentBone.boneLength)
+      .applyMatrix4(this.boneId === 1 ? new THREE.Matrix4() : this.parentBone.matrix)
     // const directionY = new THREE.Vector3().subVectors(childBonePosition, bonePosition).normalize()
     // const nextDirectionY = MathUtil.extractDirection(nextMatrix, 'y')
     // const recursionDirection = new THREE.Vector3().copy(this.recordDirection).multiplyScalar(this.recursion)
@@ -191,7 +192,7 @@ export class Bone extends THREE.Object3D {
     // const directionX = new THREE.Vector3().crossVectors(directionY, nextDirectionZ).normalize()
     // const directionZ = new THREE.Vector3().crossVectors(directionX, directionY).normalize()
     // const matrix3 = MathUtil.composeMatrix3ByAxis(directionX, directionY, directionZ)
-    nextMatrix.setPosition(childBonePosition)
+    nextMatrix.setPosition(nextBonePosition)
 
     // record
     // this.prevMatrix.copy(nextMatrix)

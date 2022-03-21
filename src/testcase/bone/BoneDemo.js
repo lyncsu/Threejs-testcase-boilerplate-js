@@ -18,7 +18,7 @@ export class BoneDemo extends Demo {
   bindScope() {}
 
   init() {
-    const num = 2
+    const num = 3
     const max = 1
     const min = 0.5
     const step = (max - min) / (num - 1)
