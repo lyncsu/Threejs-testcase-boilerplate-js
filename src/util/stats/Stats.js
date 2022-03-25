@@ -104,6 +104,32 @@ class Stats {
   }
 
   /**
+   * 添加slider
+   * @param {*} key
+   * @param {*} value
+   * @param {*} min
+   * @param {*} max
+   * @param {*} tableName
+   * @returns
+   */
+  addSlide(key, value, min, max, step, tableName, callback) {
+    if (this.data[key] === undefined) this.data[key] = value
+
+    if (!this.tables) this.tables = new Map()
+    const table = this.tables.get(tableName)
+    if (!table)
+      return this.gui.add(this.data, key, min, max, step).onChange(value => {
+        callback(value)
+      })
+    return this.tables
+      .get(tableName)
+      .add(this.data, key, min, max, step)
+      .onChange(value => {
+        callback(value)
+      })
+  }
+
+  /**
    * 添加按钮
    * @param {*} name
    * @param {*} callback

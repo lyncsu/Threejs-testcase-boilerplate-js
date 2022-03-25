@@ -1,6 +1,7 @@
 import { Demo } from '../base/Demo'
 import { Bone } from './Bone'
 import gsap from 'gsap'
+import Stats from '../../util/stats/Stats'
 
 const tweenObject = { t: 0 }
 /**
@@ -13,22 +14,28 @@ export class BoneDemo extends Demo {
 
     this.bindScope()
     this.init()
+    Stats.addTable('Bone', true)
+    Stats.addSlide('Delay', 1, 1, 5.0, 0.1, 'Bone', value => {
+      this.rootBone.delay = value
+    })
+    Stats.addSlide('Recursion', 0.99, 0.1, 0.99, 0.01, 'Bone', value => {
+      this.rootBone.recursion = value
+    })
   }
 
   bindScope() {}
 
   init() {
-    const num = 3
-    const max = 1
-    const min = 0.5
-    const step = (max - min) / (num - 1)
-    const rootBone = new Bone(2, true, true)
-    rootBone.position.set(1, 0, 0)
+    const childNum = 7
+    const max = 1.4
+    const min = 0.2
+    const step = (max - min) / (childNum - 1)
+    const rootBone = new Bone(null, true, true, this.app.scene)
     this.app.scene.add(rootBone)
     this.rootBone = rootBone
 
     let parentBone = rootBone
-    for (let i = 0; i < num; i++) {
+    for (let i = 0; i < childNum; i++) {
       const len = max - (isNaN(step * i) ? 0 : step * i)
       const child = new Bone(len)
       parentBone.addChild(child)
@@ -37,23 +44,25 @@ export class BoneDemo extends Demo {
 
     gsap.to(tweenObject, {
       repeat: -1,
-      repeatDelay: 3,
+      repeatDelay: 5,
       duration: 3,
       keyframes: {
         ease: 'none',
         // easeEach: 'power1',
         t: [0, 1, -1, 1, -1, 0],
       },
+      onRepeat: () => {
+        tweenObject.t = 0
+        rootBone.reset()
+      },
+      onUpdate: () => {
+        this.rootBone.rotation.z = (tweenObject.t * Math.PI) / 4
+        // this.rootBone.rotation.y = (tweenObject.t * Math.PI) / 2
+      },
     })
   }
 
   update() {
-    const z = (tweenObject.t * Math.PI) / 3
-
-    this.rootBone.rotation.z = z
     this.rootBone.iterate()
-    // this.rootBone.children.forEach(bone => {
-    //   if (bone instanceof Bone) bone.iterate()
-    // })
   }
 }

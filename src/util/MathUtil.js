@@ -8,10 +8,11 @@ export default class MathUtil {
    * @returns
    */
   static extractDirection(matrix, axis) {
-    const result = new Vector3()
-    if (axis === 'y') return matrix instanceof Matrix4 ? result.setFromMatrixColumn(matrix, 1) : result.setFromMatrix3Column(matrix, 1)
-    else if (axis === 'z') return matrix instanceof Matrix4 ? result.setFromMatrixColumn(matrix, 2) : result.setFromMatrix3Column(matrix, 2)
-    else return matrix instanceof Matrix4 ? result.setFromMatrixColumn(matrix, 0) : result.setFromMatrix3Column(matrix, 0)
+    const direction = new Vector3()
+    if (axis === 'y') matrix instanceof Matrix4 ? direction.setFromMatrixColumn(matrix, 1) : direction.setFromMatrix3Column(matrix, 1)
+    else if (axis === 'z') matrix instanceof Matrix4 ? direction.setFromMatrixColumn(matrix, 2) : direction.setFromMatrix3Column(matrix, 2)
+    else matrix instanceof Matrix4 ? direction.setFromMatrixColumn(matrix, 0) : direction.setFromMatrix3Column(matrix, 0)
+    return direction.normalize()
   }
 
   /**
