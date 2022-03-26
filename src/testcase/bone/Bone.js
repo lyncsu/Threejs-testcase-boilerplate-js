@@ -13,14 +13,24 @@ export class Bone extends THREE.Object3D {
   static HELPER_COLOR = 0xff0077
 
   /**
-   * 幅度迭代
+   * 默认延迟
+   */
+  static DEFAULT_DELAY = 1
+
+  /**
+   * 默认摆幅
+   */
+  static DEFAULT_RECURSION = 5
+
+  /**
+   * 摆幅迭代
    */
   get recursion() {
     return this.isRoot ? this.#recursion : this.rootBone.recursion
   }
 
   /**
-   * 幅度迭代
+   * 摆幅迭代
    */
   set recursion(value) {
     this.#recursion = value / 100
@@ -110,12 +120,12 @@ export class Bone extends THREE.Object3D {
   /**
    * 延迟
    */
-  #delay = 1
+  #delay = Bone.DEFAULT_DELAY
 
   /**
    * 幅度迭代
    */
-  #recursion = 0.05
+  #recursion = Bone.DEFAULT_RECURSION / 100
 
   /**
    * 骨头类构造函数

@@ -15,10 +15,10 @@ export class BoneDemo extends Demo {
     this.bindScope()
     this.init()
     Stats.addTable('Bone', true)
-    Stats.addSlide('Delay', 1, 1, 5.0, 0.1, 'Bone', value => {
+    Stats.addSlide('Delay', Bone.DEFAULT_DELAY, 1, 10, 1, 'Bone', value => {
       this.rootBone.delay = value
     })
-    Stats.addSlide('Recursion', 5, 1, 10, 1, 'Bone', value => {
+    Stats.addSlide('Recursion', Bone.DEFAULT_RECURSION, 1, 10, 1, 'Bone', value => {
       this.rootBone.recursion = value
     })
   }
