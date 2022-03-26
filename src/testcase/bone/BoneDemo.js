@@ -18,7 +18,7 @@ export class BoneDemo extends Demo {
     Stats.addSlide('Delay', 1, 1, 5.0, 0.1, 'Bone', value => {
       this.rootBone.delay = value
     })
-    Stats.addSlide('Recursion', 0.99, 0.1, 0.99, 0.01, 'Bone', value => {
+    Stats.addSlide('Recursion', 5, 1, 10, 1, 'Bone', value => {
       this.rootBone.recursion = value
     })
   }

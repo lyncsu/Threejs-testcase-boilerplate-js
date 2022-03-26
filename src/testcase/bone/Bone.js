@@ -23,7 +23,7 @@ export class Bone extends THREE.Object3D {
    * 幅度迭代
    */
   set recursion(value) {
-    this.#recursion = value
+    this.#recursion = value / 100
   }
 
   /**
@@ -44,7 +44,7 @@ export class Bone extends THREE.Object3D {
    * 拉伸幅度
    */
   get strength() {
-    return 1
+    return this.recursion * 100
   }
 
   /**
@@ -78,9 +78,14 @@ export class Bone extends THREE.Object3D {
   isShowHelper
 
   /**
-   * 骨骼初始姿态矩阵
+   * 骨骼长度
    */
-  boneLength
+  length
+
+  /**
+   * 骨骼总长度
+   */
+  totalLength
 
   /**
    * 父级节点
@@ -110,7 +115,7 @@ export class Bone extends THREE.Object3D {
   /**
    * 幅度迭代
    */
-  #recursion = 0.99
+  #recursion = 0.05
 
   /**
    * 骨头类构造函数
@@ -121,16 +126,15 @@ export class Bone extends THREE.Object3D {
   constructor(length, isShowHelper = true, isRoot, scene) {
     super()
 
-    this.length = length
     this.isShowHelper = Boolean(isShowHelper)
     this.isRoot = Boolean(isRoot)
-    this.boneLength = new THREE.Vector3(0, this.length, 0)
+    this.length = length || 0
     if (this.isRoot) {
       this.boneId = 0
       this.count = 0
       this.scene = scene
     }
-    this.recordDirection = new THREE.Vector3(0, 5, 0)
+    this.recordDirection = new THREE.Vector3()
     if (this.isShowHelper) this.#createBoneHelper()
   }
 
@@ -143,6 +147,13 @@ export class Bone extends THREE.Object3D {
     bone.parentBone = this
     this.childBone = bone
     this.rootBone.scene.add(bone)
+    this.rootBone.totalLength = this.rootBone.computeTotalLength()
+    this.recordDirection.set(0, this.rootBone.totalLength, 0)
+    console.info(bone.boneId, bone.parentBone.length)
+    const localMatrix = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, this.matrix)
+    const bonePosition = new THREE.Vector3(0, bone.parentBone.length, 0).applyMatrix4(localMatrix)
+    bone.position.copy(bonePosition)
+    bone.updateMatrix()
   }
 
   /**
@@ -168,7 +179,7 @@ export class Bone extends THREE.Object3D {
   }
 
   /**
-   * 迭代旋转（从第二节开始迭代）
+   * 迭代旋转
    */
   iterate() {
     if (this.boneId === 0) return this.childBone && this.childBone.iterate()
@@ -177,7 +188,7 @@ export class Bone extends THREE.Object3D {
     const parentMatrixInv = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, this.parentBone.matrix).invert()
     const localMatrix = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, parentMatrixInv)
     const boneMatrix = new THREE.Matrix4().copy(localMatrix).transpose()
-    const bonePosition = new THREE.Vector3().copy(this.parentBone.boneLength).applyMatrix4(this.parentBone.matrix)
+    const bonePosition = new THREE.Vector3(0, this.parentBone.length, 0).applyMatrix4(this.parentBone.matrix)
     const prevDirectionY = new THREE.Vector3().copy(Constant.AXIS_Y)
     const boneDirectionY = MathUtil.extractDirection(boneMatrix, 'y')
     const diffY = Math.acos(MathUtils.clamp(new THREE.Vector3().copy(prevDirectionY).dot(boneDirectionY), 0, 1))
@@ -201,12 +212,12 @@ export class Bone extends THREE.Object3D {
     nextMatrix.multiply(rotateMatrix)
 
     // phase3
-    const childPosition = new THREE.Vector3().copy(this.boneLength).applyMatrix4(this.matrix)
+    const childPosition = new THREE.Vector3(0, this.length, 0).applyMatrix4(this.matrix)
     const directionY = new THREE.Vector3().subVectors(childPosition, bonePosition).normalize()
     const nextDirectionY = MathUtil.extractDirection(nextMatrix, 'y')
-    const recursionDirection = new THREE.Vector3().copy(this.recordDirection).multiplyScalar(this.recursion)
+    const recursion = new THREE.Vector3().copy(this.recordDirection).multiplyScalar(this.recursion)
     const strengthened = new THREE.Vector3().copy(directionY).multiplyScalar(this.strength)
-    const phase = new THREE.Vector3().addVectors(nextDirectionY, strengthened).divideScalar(this.delay).sub(recursionDirection)
+    const phase = new THREE.Vector3().addVectors(nextDirectionY, strengthened).divideScalar(this.delay).sub(recursion)
 
     if (MathUtil.lessThan(phase, this.#threshold)) phase.set(0, 0, 0)
     this.recordDirection.copy(phase)
@@ -226,8 +237,8 @@ export class Bone extends THREE.Object3D {
     // next iterate
     if (this.childBone) this.childBone.iterate()
 
+    // debug
     if (this.debugMode) {
-      // debug
       if (this.boneId === 1) {
         console.info('boneId', this.boneId)
         // this.#createMatrixHelper(nextMatrix)
@@ -241,8 +252,17 @@ export class Bone extends THREE.Object3D {
    * 重置参数
    */
   reset() {
-    // this.recordDirection.set(0, 5, 0)
+    this.recordDirection.set(0, this.rootBone.totalLength, 0)
     if (this.childBone) this.childBone.reset()
+  }
+
+  /**
+   * 计算总长度
+   */
+  computeTotalLength(value) {
+    let length = value || this.length
+    if (this.childBone) length += this.length + this.childBone.computeTotalLength(length)
+    return length
   }
 
   /**
