@@ -133,12 +133,12 @@ export class Bone extends THREE.Object3D {
    * @param {*} isShowHelper 是否显示辅助器
    * @param {*} isRoot 是否设置为根节点
    */
-  constructor(length, isShowHelper = true, isRoot, scene) {
+  constructor(length = 0, isShowHelper = true, isRoot, scene) {
     super()
 
     this.isShowHelper = Boolean(isShowHelper)
     this.isRoot = Boolean(isRoot)
-    this.length = length || 0
+    this.length = length
     if (this.isRoot) {
       this.boneId = 0
       this.count = 0
@@ -159,7 +159,6 @@ export class Bone extends THREE.Object3D {
     this.rootBone.scene.add(bone)
     this.rootBone.totalLength = this.rootBone.computeTotalLength()
     this.recordDirection.set(0, this.rootBone.totalLength, 0)
-    console.info(bone.boneId, bone.parentBone.length)
     const localMatrix = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, this.matrix)
     const bonePosition = new THREE.Vector3(0, bone.parentBone.length, 0).applyMatrix4(localMatrix)
     bone.position.copy(bonePosition)
@@ -322,8 +321,7 @@ export class Bone extends THREE.Object3D {
    * todo matrix helper
    * @returns
    */
-  #createMatrixHelper(target, name) {
-    name = name || 'targetMatrix'
+  #createMatrixHelper(target, name = 'targetMatrix') {
     const axisX = MathUtil.extractDirection(target, 'x')
     const axisY = MathUtil.extractDirection(target, 'y')
     const axisZ = MathUtil.extractDirection(target, 'z')
