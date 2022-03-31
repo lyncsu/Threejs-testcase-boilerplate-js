@@ -1,9 +1,9 @@
-import { RainDemo } from './rain/RainDemo'
-import { DracoDemo } from './draco/DracoDemo'
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
+// import { RainDemo } from './rain/RainDemo'
+// import { DracoDemo } from './draco/DracoDemo'
+// import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import Stats from '../util/stats/Stats'
 import { ShaderDebugDemo } from './shaderdebug/ShaderDebugDemo'
-import { Box2dDemo } from './box2d/Box2dDemo'
+// import { Box2dDemo } from './box2d/Box2dDemo'
 import { BoneDemo } from './bone/BoneDemo'
 
 /**
@@ -47,7 +47,7 @@ export class Testcase {
       // if (ballGeometry) this.ballDisplay.setValue(BufferGeometryUtils.estimateBytesUsed(ballGeometry) + ' bytes')
       // if (rainFallGeometry) this.fallDisplay.setValue(BufferGeometryUtils.estimateBytesUsed(rainFallGeometry) + ' bytes')
     }
-    if (this.box2d) this.box2d.update()
+    // if (this.box2d) this.box2d.update()
     if (this.bone) this.bone.update()
   }
 }

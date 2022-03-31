@@ -26,7 +26,7 @@ export class App {
   }
 
   init() {
-    console.info('hello world')
+    console.info('[App] hello world')
 
     this.bindScope()
     this.initClock()

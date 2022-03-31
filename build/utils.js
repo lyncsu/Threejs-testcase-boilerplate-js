@@ -6,6 +6,15 @@ const isDev = process.env.NODE_ENV === 'development'
 const path = require('path')
 const _root = path.resolve(__dirname, '..')
 
+exports.isDefined = v => v !== undefined
+exports.isObject = v => v !== null && v !== undefined && typeof v === 'object' && !Array.isArray(v)
+exports.isBoolean = v => v === true || v === false
+exports.isNumber = v => v !== undefined && (typeof v === 'number' || v instanceof Number) && isFinite(v)
+exports.isString = v => v !== null && v !== undefined && (typeof v === 'string' || v instanceof String)
+exports.isArray = v => Array.isArray(v)
+exports.isFunction = v => typeof v === 'function'
+exports.isArrayOfString = v => isArray(v) && v.every(i => isString(i))
+
 exports.resolve = function (args) {
   args = Array.prototype.slice.call(arguments, 0)
   return path.join.apply(path, [_root].concat(args))

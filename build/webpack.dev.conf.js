@@ -11,14 +11,11 @@ const utils = require('./utils')
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 const os = require('os')
+const PrimaryLoader = require('./plugins/primary-loader')
 //process.traceDeprecation = true;
 
 const devConfig = merge(baseConfig, {
   mode: 'development',
-  // output: {
-  //   library: 'LYNC',
-  //   libraryTarget: 'umd',
-  // },
   entry: ['./src/App.js'],
   devtool: config.dev.devtool,
   watch: config.dev.watch,
@@ -32,6 +29,7 @@ const devConfig = merge(baseConfig, {
       template: 'public/index.html',
       inject: true,
     }),
+    new PrimaryLoader({ delay: 1000 }),
   ],
   devServer: {
     contentBase: path.join(__dirname, '../public'),

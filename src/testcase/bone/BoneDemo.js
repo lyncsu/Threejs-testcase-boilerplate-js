@@ -8,7 +8,6 @@ const tweenObject = { t: 0 }
  * 骨骼测试demo
  */
 export class BoneDemo extends Demo {
-  rootBone
   constructor(root) {
     super(root)
 
@@ -30,14 +29,14 @@ export class BoneDemo extends Demo {
     const max = 1.4
     const min = 0.2
     const step = (max - min) / (childNum - 1)
-    const rootBone = new Bone(null, true, true, this.app.scene)
+    const rootBone = new Bone({ isShowHelper: true, isRoot: true, container: this.app.scene })
     this.app.scene.add(rootBone)
     this.rootBone = rootBone
 
     let parentBone = rootBone
     for (let i = 0; i < childNum; i++) {
-      const len = max - (isNaN(step * i) ? 0 : step * i)
-      const child = new Bone(len)
+      const length = max - (isNaN(step * i) ? 0 : step * i)
+      const child = new Bone({ length })
       parentBone.addChild(child)
       parentBone = child
     }

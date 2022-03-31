@@ -133,19 +133,22 @@ export class Bone extends THREE.Object3D {
    * @param {*} isShowHelper 是否显示辅助器
    * @param {*} isRoot 是否设置为根节点
    */
-  constructor(length = 0, isShowHelper = true, isRoot, scene) {
+  constructor(params = { length, isShowHelper, isRoot, container, delay, recursion }) {
     super()
 
-    this.isShowHelper = Boolean(isShowHelper)
-    this.isRoot = Boolean(isRoot)
-    this.length = length
-    if (this.isRoot) {
+    const finalParams = { isShowHelper: true, isRoot: false, length: 0, delay: Bone.DEFAULT_DELAY, recursion: Bone.DEFAULT_RECURSION }
+    Object.assign(finalParams, params)
+    if (finalParams.isRoot) {
+      this.isRoot = true
       this.boneId = 0
       this.count = 0
-      this.scene = scene
+      this.container = finalParams.container
     }
+    this.length = finalParams.length
+    this.delay = finalParams.delay
+    this.recursion = finalParams.recursion
     this.recordDirection = new THREE.Vector3()
-    if (this.isShowHelper) this.#createBoneHelper()
+    if (finalParams.isShowHelper) this.#createBoneHelper()
   }
 
   /**
@@ -156,7 +159,7 @@ export class Bone extends THREE.Object3D {
     bone.boneId = ++this.rootBone.count
     bone.parentBone = this
     this.childBone = bone
-    this.rootBone.scene.add(bone)
+    this.rootBone.container.add(bone)
     this.rootBone.totalLength = this.rootBone.computeTotalLength()
     this.recordDirection.set(0, this.rootBone.totalLength, 0)
     const localMatrix = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, this.matrix)
@@ -170,10 +173,10 @@ export class Bone extends THREE.Object3D {
    * @param {*} boneId
    */
   getChildBoneById(boneId) {
-    const index = this.rootBone.scene.children.findIndex(
+    const index = this.rootBone.container.children.findIndex(
       child => child instanceof Bone && child.boneId === boneId && child.parentBone == this
     )
-    if (index !== -1) return this.rootBone.scene.children[index]
+    if (index !== -1) return this.rootBone.container.children[index]
   }
 
   /**
@@ -237,7 +240,7 @@ export class Bone extends THREE.Object3D {
     const directionZ = new THREE.Vector3().crossVectors(directionX, directionY).normalize()
     nextMatrix.makeBasis(directionX, directionY, directionZ)
 
-    // record for next iteration
+    // update matrix
     const quaternion = new THREE.Quaternion().setFromRotationMatrix(nextMatrix)
     this.position.copy(bonePosition)
     this.quaternion.copy(quaternion)
@@ -251,7 +254,7 @@ export class Bone extends THREE.Object3D {
       if (this.boneId === 1) {
         console.info('boneId', this.boneId)
         // this.#createMatrixHelper(nextMatrix)
-        // this.#createDirectionHelper(phase)
+        this.#createDirectionHelper(phase)
         // this.#createPositionHelper(bonePosition)
       }
     }
@@ -277,51 +280,49 @@ export class Bone extends THREE.Object3D {
   /**
    * 方向辅助
    */
-  #createDirectionHelper(target, name, color = 0x00ff00) {
+  #createDirectionHelper(target, name = 'helperTarget', color = 0x00ff00) {
     let hasHelper = false
-    this.rootBone.scene.children.forEach(child => {
-      if (child instanceof THREE.ArrowHelper) {
-        if (child.uuid === this.boneId + `_${name ? name : 'helperTarget'}`) {
-          hasHelper = true
-          child.setDirection(target)
-          child.setLength(target.length())
-          child.position.copy(this.position)
-        }
-      }
-    })
+    this.rootBone.container.children
+      .filter(child => this.#isHelperExsit(child, name, THREE.ArrowHelper))
+      .forEach(child => {
+        hasHelper = true
+        child.setDirection(target)
+        child.setLength(target.length())
+        child.position.copy(this.position)
+      })
     if (!hasHelper) {
       const helper = new THREE.ArrowHelper(target, this.position, target.length(), color)
-      helper.uuid = this.boneId + `_${name ? name : 'helperTarget'}`
-      this.rootBone.scene.add(helper)
+      helper.uuid = this.boneId + `_${name}`
+      this.rootBone.container.add(helper)
     }
   }
 
   /**
    * 位置辅助
    */
-  #createPositionHelper(target) {
+  #createPositionHelper(target, name = 'helperTarget') {
     let hasHelper = false
-    this.rootBone.scene.children.forEach(child => {
-      if (child instanceof THREE.AxesHelper) {
-        if (child.uuid === this.boneId) {
-          hasHelper = true
-          child.position.copy(target)
-        }
-      }
-    })
+    this.rootBone.container.children
+      .filter(child => this.#isHelperExsit(child, name, THREE.AxesHelper))
+      .forEach(child => {
+        hasHelper = true
+        child.setDirection(target)
+        child.setLength(target.length())
+        child.position.copy(this.position)
+      })
     if (!hasHelper) {
       const helper = new THREE.AxesHelper(0.5)
       helper.uuid = this.boneId
       helper.position.copy(target)
-      this.rootBone.scene.add(helper)
+      this.rootBone.container.add(helper)
     }
   }
 
   /**
-   * todo matrix helper
+   * matrix辅助器
    * @returns
    */
-  #createMatrixHelper(target, name = 'targetMatrix') {
+  #createMatrixHelper(target) {
     const axisX = MathUtil.extractDirection(target, 'x')
     const axisY = MathUtil.extractDirection(target, 'y')
     const axisZ = MathUtil.extractDirection(target, 'z')
@@ -357,5 +358,18 @@ export class Bone extends THREE.Object3D {
     const material = new THREE.LineBasicMaterial({ color: Bone.HELPER_COLOR })
     const line = new THREE.LineSegments(geometry, material)
     helper.add(line)
+  }
+
+  /**
+   * 检查是否存在
+   * @param {*} child
+   * @param {*} name
+   * @param {*} ClassType
+   * @returns
+   */
+  #isHelperExsit(child, name, ClassType) {
+    if (child instanceof ClassType) {
+      if (child.uuid === this.boneId + `_${name}`) return true
+    }
   }
 }
