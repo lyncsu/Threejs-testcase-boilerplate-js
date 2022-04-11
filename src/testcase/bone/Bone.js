@@ -103,16 +103,6 @@ export class Bone extends THREE.Object3D {
   parentBone
 
   /**
-   * 实现delay的递归次数
-   */
-  iteration
-
-  /**
-   * 上一步迭代矩阵记录
-   */
-  prevMatrix
-
-  /**
    * 阈值
    */
   #threshold = 0.001
