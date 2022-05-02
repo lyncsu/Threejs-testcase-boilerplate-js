@@ -187,8 +187,12 @@ export class Bone extends THREE.Object3D {
     if (this.boneId === 0) return this.childBone && this.childBone.iterate()
 
     // phase1
-    const parentMatrixInv = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, this.parentBone.matrix).invert()
-    const localMatrix = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, parentMatrixInv)
+    let localMatrix
+    if (this.boneId === 1) localMatrix = new THREE.Matrix4().copy(this.rootBone.matrixWorld).invert()
+    else {
+      const parentMatrixInv = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, this.parentBone.matrix).invert()
+      localMatrix = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, parentMatrixInv)
+    }
     const boneMatrix = new THREE.Matrix4().copy(localMatrix).transpose()
     const bonePosition = new THREE.Vector3(0, this.parentBone.length, 0).applyMatrix4(this.parentBone.matrix)
     const prevDirectionY = new THREE.Vector3().copy(Constant.AXIS_Y)
