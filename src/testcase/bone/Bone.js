@@ -10,7 +10,7 @@ export class Bone extends THREE.Object3D {
   /**
    * 辅助器颜色
    */
-  static HELPER_COLOR = 0xff0077
+  static HELPER_COLOR = 0x000077
 
   /**
    * 默认延迟
@@ -66,13 +66,6 @@ export class Bone extends THREE.Object3D {
   }
 
   /**
-   * 获取下一节点
-   */
-  get nextBone() {
-    return this.getChildBoneById(this.boneId + 1)
-  }
-
-  /**
    * 是否为根节点
    */
   isRoot
@@ -80,7 +73,7 @@ export class Bone extends THREE.Object3D {
   /**
    * 调试模式
    */
-  debugMode
+  debugMode = true
 
   /**
    * 是否显示辅助线
@@ -101,6 +94,11 @@ export class Bone extends THREE.Object3D {
    * 父级节点
    */
   parentBone
+
+  /**
+   * 上次矩阵记录
+   */
+  prevMatrix
 
   /**
    * 阈值
@@ -132,12 +130,14 @@ export class Bone extends THREE.Object3D {
       this.isRoot = true
       this.boneId = 0
       this.count = 0
-      this.container = finalParams.container
+      // debug
+      this.scene = finalParams.scene
     }
     this.length = finalParams.length
     this.delay = finalParams.delay
     this.recursion = finalParams.recursion
     this.recordDirection = new THREE.Vector3()
+    this.prevMatrix = new THREE.Matrix4()
     if (finalParams.isShowHelper) this.#createBoneHelper()
   }
 
@@ -149,24 +149,13 @@ export class Bone extends THREE.Object3D {
     bone.boneId = ++this.rootBone.count
     bone.parentBone = this
     this.childBone = bone
-    this.rootBone.container.add(bone)
+    this.add(bone)
     this.rootBone.totalLength = this.rootBone.computeTotalLength()
     this.recordDirection.set(0, this.rootBone.totalLength, 0)
-    const localMatrix = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, this.matrix)
-    const bonePosition = new THREE.Vector3(0, bone.parentBone.length, 0).applyMatrix4(localMatrix)
+
+    const bonePosition = new THREE.Vector3(0, bone.parentBone.length, 0)
     bone.position.copy(bonePosition)
     bone.updateMatrix()
-  }
-
-  /**
-   * 获取骨头
-   * @param {*} boneId
-   */
-  getChildBoneById(boneId) {
-    const index = this.rootBone.container.children.findIndex(
-      child => child instanceof Bone && child.boneId === boneId && child.parentBone == this
-    )
-    if (index !== -1) return this.rootBone.container.children[index]
   }
 
   /**
@@ -184,41 +173,42 @@ export class Bone extends THREE.Object3D {
    * 迭代旋转
    */
   iterate() {
-    if (this.boneId === 0) return this.childBone && this.childBone.iterate()
-
     // phase1
-    let localMatrix
-    if (this.boneId === 1) localMatrix = new THREE.Matrix4().copy(this.rootBone.matrixWorld).invert()
-    else {
-      const parentMatrixInv = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, this.parentBone.matrix).invert()
-      localMatrix = new THREE.Matrix4().multiplyMatrices(this.rootBone.matrixWorld, parentMatrixInv)
+    if (this.isRoot) {
+      this.prevMatrix.copy(this.matrixWorld)
+      this.childBone && this.childBone.iterate()
+      return
     }
-    const boneMatrix = new THREE.Matrix4().copy(localMatrix).transpose()
-    const bonePosition = new THREE.Vector3(0, this.parentBone.length, 0).applyMatrix4(this.parentBone.matrix)
-    const prevDirectionY = new THREE.Vector3().copy(Constant.AXIS_Y)
-    const boneDirectionY = MathUtil.extractDirection(boneMatrix, 'y')
-    const diffY = Math.acos(MathUtils.clamp(new THREE.Vector3().copy(prevDirectionY).dot(boneDirectionY), 0, 1))
-    const axis = new THREE.Vector3().crossVectors(prevDirectionY, boneDirectionY).normalize()
+
+    const rootMatrix = new THREE.Matrix4().copy(this.rootBone.matrixWorld).transpose()
+    const rootMatrixInv = new THREE.Matrix4().copy(rootMatrix).invert()
+    const parent = new THREE.Matrix4().copy(this.parent.matrix)
+    const targetMatrix = new THREE.Matrix4().multiplyMatrices(rootMatrixInv, parent)
+    const prevDirectionY = MathUtil.extractDirection(this.rootBone.prevMatrix, 'y')
+    const targetDirectionY = MathUtil.extractDirection(targetMatrix, 'y')
+    const diffY = Math.acos(MathUtils.clamp(new THREE.Vector3().copy(prevDirectionY).dot(targetDirectionY), 0, 1))
+    const axis = new THREE.Vector3().crossVectors(prevDirectionY, targetDirectionY).normalize()
     const rotateMatrix = new THREE.Matrix4().makeRotationAxis(axis, diffY)
     const nextMatrix = new THREE.Matrix4().copy(rotateMatrix)
-
+    /*
     // phase2
     const nextDirectionX = MathUtil.extractDirection(nextMatrix, 'x')
-    const boneDirectionX = MathUtil.extractDirection(boneMatrix, 'x')
-    const dotValue = nextDirectionX.dot(boneDirectionX)
+    const targetDirectionX = MathUtil.extractDirection(targetMatrix, 'x')
+    const dotValue = nextDirectionX.dot(targetDirectionX)
     let roll
     if (dotValue > 1) roll = 0
     else roll = Math.acos(dotValue)
     roll = roll / this.delay
+    const checkDirection = new THREE.Vector3().crossVectors(nextDirectionX, targetDirectionX)
+    if (checkDirection.dot(targetDirectionY) < 0) roll = -roll
 
-    const checkDirection = new THREE.Vector3().crossVectors(nextDirectionX, boneDirectionX)
-    if (checkDirection.dot(boneDirectionY) < 0) roll = -roll
-    const axisZ = MathUtil.extractDirection(nextMatrix, 'z')
-    rotateMatrix.makeRotationAxis(axisZ, roll)
+    const directionZ = MathUtil.extractDirection(nextMatrix, 'z')
+    rotateMatrix.makeRotationAxis(directionZ, roll)
     nextMatrix.multiply(rotateMatrix)
 
     // phase3
     const childPosition = new THREE.Vector3(0, this.length, 0).applyMatrix4(this.matrix)
+    const bonePosition = new THREE.Vector3(0, this.parentBone.length, 0)
     const directionY = new THREE.Vector3().subVectors(childPosition, bonePosition).normalize()
     const nextDirectionY = MathUtil.extractDirection(nextMatrix, 'y')
     const recursion = new THREE.Vector3().copy(this.recordDirection).multiplyScalar(this.recursion)
@@ -233,12 +223,13 @@ export class Bone extends THREE.Object3D {
     const directionX = new THREE.Vector3().crossVectors(directionY, nextDirectionZ).normalize()
     const directionZ = new THREE.Vector3().crossVectors(directionX, directionY).normalize()
     nextMatrix.makeBasis(directionX, directionY, directionZ)
-
+    */
     // update matrix
     const quaternion = new THREE.Quaternion().setFromRotationMatrix(nextMatrix)
-    this.position.copy(bonePosition)
     this.quaternion.copy(quaternion)
     this.updateMatrix()
+
+    this.prevMatrix.copy(nextMatrix)
 
     // next iterate
     if (this.childBone) this.childBone.iterate()
@@ -246,9 +237,8 @@ export class Bone extends THREE.Object3D {
     // debug
     if (this.debugMode) {
       if (this.boneId === 1) {
-        console.info('boneId', this.boneId)
+        // this.#createDirectionHelper(directionY)
         // this.#createMatrixHelper(nextMatrix)
-        this.#createDirectionHelper(phase)
         // this.#createPositionHelper(bonePosition)
       }
     }
@@ -274,41 +264,54 @@ export class Bone extends THREE.Object3D {
   /**
    * 方向辅助
    */
-  #createDirectionHelper(target, name = 'helperTarget', color = 0x00ff00) {
+  #createDirectionHelper(target, name = 'directionHelperTarget', color = 0x00ff00, noWorldTransform = false) {
     let hasHelper = false
-    this.rootBone.container.children
+    this.rootBone.scene.children
       .filter(child => this.#isHelperExsit(child, name, THREE.ArrowHelper))
       .forEach(child => {
         hasHelper = true
-        child.setDirection(target)
-        child.setLength(target.length())
-        child.position.copy(this.position)
+        const worldTarget = new THREE.Vector3().copy(target)
+        child.setDirection(worldTarget)
+        child.setLength(worldTarget.length())
+
+        if (!noWorldTransform) {
+          const worldPosition = new THREE.Vector3()
+          this.localToWorld(worldPosition)
+          child.position.copy(worldPosition)
+        }
       })
     if (!hasHelper) {
-      const helper = new THREE.ArrowHelper(target, this.position, target.length(), color)
+      const worldPosition = new THREE.Vector3()
+      if (!noWorldTransform) {
+        this.localToWorld(worldPosition)
+      }
+      const worldTarget = new THREE.Vector3().copy(target)
+      const helper = new THREE.ArrowHelper(worldTarget, worldPosition, worldTarget.length(), color)
       helper.uuid = this.boneId + `_${name}`
-      this.rootBone.container.add(helper)
+      this.rootBone.scene.add(helper)
     }
   }
 
   /**
    * 位置辅助
    */
-  #createPositionHelper(target, name = 'helperTarget') {
+  #createPositionHelper(target, name = 'positionHelperTarget') {
     let hasHelper = false
-    this.rootBone.container.children
+    this.rootBone.scene.children
       .filter(child => this.#isHelperExsit(child, name, THREE.AxesHelper))
       .forEach(child => {
         hasHelper = true
         child.setDirection(target)
         child.setLength(target.length())
-        child.position.copy(this.position)
+        const worldPosition = this.localToWorld(this.position)
+        child.position.copy(worldPosition)
       })
     if (!hasHelper) {
       const helper = new THREE.AxesHelper(0.5)
       helper.uuid = this.boneId
-      helper.position.copy(target)
-      this.rootBone.container.add(helper)
+      const worldTarget = this.localToWorld(target)
+      helper.position.copy(worldTarget)
+      this.rootBone.scene.add(helper)
     }
   }
 
@@ -336,7 +339,6 @@ export class Bone extends THREE.Object3D {
       const geometry = new THREE.SphereBufferGeometry(0.125, 3, 2)
       const center = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: Bone.HELPER_COLOR, wireframe: true }))
       helper.add(center)
-      return
     }
 
     const arrowHeight = 0.25
