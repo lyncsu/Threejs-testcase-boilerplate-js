@@ -27,10 +27,12 @@ class BlenderUtil {
    * @param {*} matrixInThree
    */
   makeBlenderMatrix() {
+    // α = 绕z轴逆时针旋转，β = 继续绕x轴旋转后的轴，逆时针旋转
+    // M = Rz(α)·Rz(π/2 - α)·Ry(β)·Rz(α - π/2)·T(x, y, z)
     const axisX = new THREE.Vector3(0, 1, 0)
     const axisY = new THREE.Vector3(0, 0, 1)
     const axisZ = new THREE.Vector3(1, 0, 0)
-    const blenderMatrix = new THREE.Matrix4().makeBasis(axisX, axisY, axisZ).invert()
+    const blenderMatrix = new THREE.Matrix4().makeBasis(axisX, axisY, axisZ)
     return blenderMatrix
   }
 
@@ -38,19 +40,23 @@ class BlenderUtil {
    * 转换到blender坐标系
    */
   toBlender(target) {
-    if (target instanceof THREE.Vector3) {
+    /* if (target instanceof THREE.Vector3) {
       const vectorBlender = new THREE.Vector3().copy(target).applyMatrix4(this.BLENDER_MATRIX)
       return vectorBlender
     } else if (target instanceof THREE.Euler) {
-      const eulerBlender = new THREE.Euler(target.z, target.x, target.y)
+      // const eulerBlender = new THREE.Euler(target.z, target.x, target.y)
+      const eulerBlender = new THREE.Euler().copy(target)
       return eulerBlender
     } else if (target instanceof THREE.Matrix4) {
+      // 提取位置
       const position = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
+      // 还原至原点
       const positionBlender = this.toBlender(position)
       const matrixBlender = new THREE.Matrix4().multiplyMatrices(target, this.BLENDER_MATRIX)
       matrixBlender.setPosition(positionBlender)
       return matrixBlender
-    }
+    } */
+    return target
   }
 
   /**

@@ -188,23 +188,25 @@ export class Bone extends THREE.Object3D {
     if (this.isRoot) {
       this.prevMatrix.copy(this.matrixWorld)
       this.childBone && this.childBone.iterate()
+      const basis = BlenderUtil.toThree(new THREE.Matrix4())
       this.#createMatrixHelper()
       return
     }
 
     // phase1
     const nextMatrix = new THREE.Matrix4()
-    const currentParentMatrix = new THREE.Matrix4().copy(this.rootBone.matrixWorld)
+    const cur_p_mt = BlenderUtil.toBlender(new THREE.Matrix4().copy(this.rootBone.matrixWorld))
+    // ✔️
     // console.info(currentParentMatrix.elements)
     // const currentParentBlender = new THREE.Matrix4().multiplyMatrices(currentParentMatrix, this.#blenderMatrix)
-    const currentParentT = new THREE.Matrix4().copy(currentParentMatrix).transpose()
+    const currentParentT = new THREE.Matrix4().copy(cur_p_mt).transpose()
     // console.info('T', currentParentT.elements)
     // const prevMatrix = this.#toBlender(this.prevMatrix)
     const boneLengthVector = new THREE.Vector3(0, this.parentBone.length, 0)
     const boneLengthMatrix = new THREE.Matrix4().setPosition(boneLengthVector)
     const boneLengthMatrixBlender = BlenderUtil.toBlender(boneLengthMatrix)
     const boneLengthMatrixThree = BlenderUtil.toThree(boneLengthMatrixBlender)
-    const targetMatrix = new THREE.Matrix4().multiplyMatrices(boneLengthMatrixBlender, currentParentMatrix)
+    const targetMatrix = new THREE.Matrix4().multiplyMatrices(boneLengthMatrixThree, cur_p_mt)
     /* const parentMatrixWorld = new THREE.Matrix4().copy(this.parent.matrixWorld)
     const parentMatrix = new THREE.Matrix4().copy(this.parent.matrix)
     
@@ -271,7 +273,7 @@ export class Bone extends THREE.Object3D {
         // this.#createDirectionHelper(boneLengthVectorBlender)
         // this.#createDirectionHelper(targetDirectionY, 'targetDirectionX', 0xff000e)
         // this.#createPositionHelper(bonePosition)
-        // this.#createMatrixHelper(boneLengthMatrix, null, true)
+        // this.#createMatrixHelper(cur_p_mt, null, true)
         // this.#createAxesHelper(currentParentMatrix)
       }
     }
