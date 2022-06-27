@@ -28,26 +28,29 @@ export class BoneDemo extends Demo {
 
   init() {
     const container = new THREE.Object3D()
-    const rotationInBlender = new THREE.Euler((Math.PI / 180) * 40, 0, (Math.PI / 180) * -22.5)
-    const rotation = BlenderUtil.toThree(rotationInBlender)
-    container.rotation.copy(rotation)
+    const rotation = new THREE.Euler((Math.PI / 180) * 40, 0, (Math.PI / 180) * -22.5)
+    // container.rotation.copy(rotation)
     container.visible = false
 
     const geometry = new THREE.ConeBufferGeometry(0.1, 0.2, 10)
     geometry.translate(0, 0.1, 0)
     const object = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial())
     this.app.scene.add(object)
+    // in blender
+    const objectPosition = new THREE.Vector3(0.5, 1, 2)
+    // object.position.copy(BlenderUtil.toThree(position))
+    const objectRotation = new THREE.Euler((Math.PI / 180) * 0, (Math.PI / 180) * 0, (Math.PI / 180) * 0)
+    const objectQuaternion = new THREE.Quaternion().setFromEuler(objectRotation)
+    const objectScale = new THREE.Vector3()
+    const objectMatrix = new THREE.Matrix4()
+    objectMatrix.compose(objectPosition, objectQuaternion, objectScale)
+    const objectMatrixInThree = BlenderUtil.toThree(objectMatrix)
+    console.info(objectMatrixInThree)
+    object.matrix.copy(objectMatrixInThree)
+    // tweenObject.rotation = objectRotation
+    // tweenObject.object = object
 
-    const positionInBlender = new THREE.Vector3(0.5, 1, 2)
-    object.position.copy(BlenderUtil.toThree(positionInBlender))
-
-    const objectRotationInBlender = new THREE.Euler((Math.PI / 180) * 22.5, (Math.PI / 180) * 30, (Math.PI / 180) * 60)
-    object.rotation.copy(BlenderUtil.toThree(objectRotationInBlender))
-
-    tweenObject.rotation = objectRotationInBlender
-    tweenObject.object = object
-
-    // const rotationMatrix = new THREE.Matrix4().makeRotationFromEuler(rotationInBlender)
+    // const rotationMatrix = new THREE.Matrix4().makeRotationFromEuler(rotation)
     // container.matrixAutoUpdate = false
     // container.matrix.copy(rotation)
     // container.updateMatrixWorld()
@@ -104,9 +107,9 @@ export class BoneDemo extends Demo {
 
   update() {
     this.rootBone.iterate()
-    tweenObject.rotation.x += (1 / 180) * Math.PI
-    const rotation = BlenderUtil.toThree(tweenObject.rotation)
-    tweenObject.object.rotation.copy(rotation)
+    // tweenObject.rotation.x += (1 / 180) * Math.PI
+    // const rotation = BlenderUtil.toThree(tweenObject.rotation)
+    // tweenObject.object.rotation.copy(rotation)
   }
 
   #initHelper() {
