@@ -71,11 +71,12 @@ class BlenderUtil {
       const eulerThree = new THREE.Euler(target.y, target.z, target.x)
       return eulerThree
     } else if (target instanceof THREE.Matrix4) {
-      const position = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
-      const positionBlender = this.toThree(position)
-      const matrixThree = new THREE.Matrix4().multiplyMatrices(target, this.THREE_MATRIX)
-      matrixThree.setPosition(positionBlender)
-      return matrixThree
+      this.BLENDER_MATRIX
+      // const positionBlender = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
+      // const positionThree = this.toThree(positionBlender)
+      // const matrixThree = new THREE.Matrix4().multiplyMatrices(target, this.THREE_MATRIX)
+      // matrixThree.setPosition(positionThree)
+      return target
     }
   }
 }

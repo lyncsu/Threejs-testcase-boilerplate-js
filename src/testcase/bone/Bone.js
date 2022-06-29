@@ -188,8 +188,7 @@ export class Bone extends THREE.Object3D {
     if (this.isRoot) {
       this.prevMatrix.copy(this.matrixWorld)
       this.childBone && this.childBone.iterate()
-      const basis = BlenderUtil.toThree(new THREE.Matrix4())
-      this.#createMatrixHelper()
+      this.#createMatrixHelper(BlenderUtil.THREE_MATRIX)
       return
     }
 
@@ -308,8 +307,8 @@ export class Bone extends THREE.Object3D {
   ) {
     let hasHelper = false
     this.rootBone.scene.children
-      .filter(child => this.#isHelperExsit(child, name, THREE.ArrowHelper))
-      .forEach(child => {
+      .filter((child) => this.#isHelperExsit(child, name, THREE.ArrowHelper))
+      .forEach((child) => {
         hasHelper = true
         const worldTarget = new THREE.Vector3().copy(target).applyMatrix4(child.parent.matrixWorld)
         child.setDirection(worldTarget)
@@ -342,8 +341,8 @@ export class Bone extends THREE.Object3D {
   #createPositionHelper(target, name = 'positionHelperTarget') {
     let hasHelper = false
     this.rootBone.scene.children
-      .filter(child => this.#isHelperExsit(child, name, THREE.AxesHelper))
-      .forEach(child => {
+      .filter((child) => this.#isHelperExsit(child, name, THREE.AxesHelper))
+      .forEach((child) => {
         hasHelper = true
         child.position.copy(target)
       })
@@ -373,8 +372,8 @@ export class Bone extends THREE.Object3D {
   #createAxesHelper(target, name = 'axesHelper') {
     let hasHelper = false
     this.rootBone.scene.children
-      .filter(child => this.#isHelperExsit(child, name, THREE.AxesHelper))
-      .forEach(child => {
+      .filter((child) => this.#isHelperExsit(child, name, THREE.AxesHelper))
+      .forEach((child) => {
         hasHelper = true
         child.matrix.copy(target)
         child.updateWorldMatrix(true, false)

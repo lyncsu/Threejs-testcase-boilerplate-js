@@ -16,10 +16,10 @@ export class BoneDemo extends Demo {
     this.bindScope()
     this.init()
     Stats.addTable('Bone', true)
-    Stats.addSlide('Delay', Bone.DEFAULT_DELAY, 1, 10, 1, 'Bone', value => {
+    Stats.addSlide('Delay', Bone.DEFAULT_DELAY, 1, 10, 1, 'Bone', (value) => {
       this.rootBone.delay = value
     })
-    Stats.addSlide('Recursion', Bone.DEFAULT_RECURSION, 1, 10, 1, 'Bone', value => {
+    Stats.addSlide('Recursion', Bone.DEFAULT_RECURSION, 1, 10, 1, 'Bone', (value) => {
       this.rootBone.recursion = value
     })
   }
@@ -32,21 +32,30 @@ export class BoneDemo extends Demo {
     // container.rotation.copy(rotation)
     container.visible = false
 
-    const geometry = new THREE.ConeBufferGeometry(0.1, 0.2, 10)
-    geometry.translate(0, 0.1, 0)
+    // const geometry = new THREE.ConeBufferGeometry(0.1, 0.2, 10)
+    const geometry = new THREE.BoxBufferGeometry(0.1, 0.2, 0.3)
+    // geometry.translate(0, 0.1, 0)
     const object = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial())
+    object.matrixAutoUpdate = false
     this.app.scene.add(object)
-    // in blender
+    // IN BLENDER
     const objectPosition = new THREE.Vector3(0.5, 1, 2)
-    // object.position.copy(BlenderUtil.toThree(position))
-    const objectRotation = new THREE.Euler((Math.PI / 180) * 0, (Math.PI / 180) * 0, (Math.PI / 180) * 0)
-    const objectQuaternion = new THREE.Quaternion().setFromEuler(objectRotation)
-    const objectScale = new THREE.Vector3()
-    const objectMatrix = new THREE.Matrix4()
-    objectMatrix.compose(objectPosition, objectQuaternion, objectScale)
-    const objectMatrixInThree = BlenderUtil.toThree(objectMatrix)
-    console.info(objectMatrixInThree)
-    object.matrix.copy(objectMatrixInThree)
+    const objectRotation = new THREE.Euler((Math.PI / 180) * 0, (Math.PI / 180) * 0, (Math.PI / 180) * 45)
+    const axisX = new THREE.Vector3(0, 0, 1)
+    const axisY = new THREE.Vector3(1, 0, 0)
+    const axisZ = new THREE.Vector3(0, 1, 0)
+    const RX = new THREE.Matrix4().makeRotationAxis(axisX, objectRotation.x)
+    const RY = new THREE.Matrix4().makeRotationAxis(axisY, objectRotation.y)
+    const RZ = new THREE.Matrix4().makeRotationAxis(axisZ, objectRotation.z)
+    objectPosition.applyMatrix4(BlenderUtil.THREE_MATRIX)
+    const T = new THREE.Matrix4().setPosition(objectPosition)
+    const matrix = new THREE.Matrix4().multiply(RX).multiply(RY).multiply(RZ).copyPosition(T)
+
+    // console.info(matrix)
+    // const objectMatrixInThree = BlenderUtil.toThree(objectMatrix)
+    // console.info(objectMatrixInThree)
+    object.matrix.copy(matrix)
+    object.updateMatrixWorld()
     // tweenObject.rotation = objectRotation
     // tweenObject.object = object
 
