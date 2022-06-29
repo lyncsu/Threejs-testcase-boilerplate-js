@@ -16,10 +16,10 @@ export class BoneDemo extends Demo {
     this.bindScope()
     this.init()
     Stats.addTable('Bone', true)
-    Stats.addSlide('Delay', Bone.DEFAULT_DELAY, 1, 10, 1, 'Bone', (value) => {
+    Stats.addSlide('Delay', Bone.DEFAULT_DELAY, 1, 10, 1, 'Bone', value => {
       this.rootBone.delay = value
     })
-    Stats.addSlide('Recursion', Bone.DEFAULT_RECURSION, 1, 10, 1, 'Bone', (value) => {
+    Stats.addSlide('Recursion', Bone.DEFAULT_RECURSION, 1, 10, 1, 'Bone', value => {
       this.rootBone.recursion = value
     })
   }
@@ -33,14 +33,17 @@ export class BoneDemo extends Demo {
     container.visible = false
 
     // const geometry = new THREE.ConeBufferGeometry(0.1, 0.2, 10)
-    const geometry = new THREE.BoxBufferGeometry(0.1, 0.2, 0.3)
+    const geometry = new THREE.BoxBufferGeometry(1, 1, 1)
+    geometry.center()
+    geometry.scale(0.1, 0.2, 0.3)
     // geometry.translate(0, 0.1, 0)
     const object = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial())
     object.matrixAutoUpdate = false
     this.app.scene.add(object)
     // IN BLENDER
     const objectPosition = new THREE.Vector3(0.5, 1, 2)
-    const objectRotation = new THREE.Euler((Math.PI / 180) * 0, (Math.PI / 180) * 0, (Math.PI / 180) * 45)
+    const objectQuaternion = new THREE.Quaternion(0.492404, -0.369616, 0.492404, 0.615191)
+    const objectRotation = new THREE.Euler().setFromQuaternion(objectQuaternion)
     const axisX = new THREE.Vector3(0, 0, 1)
     const axisY = new THREE.Vector3(1, 0, 0)
     const axisZ = new THREE.Vector3(0, 1, 0)
