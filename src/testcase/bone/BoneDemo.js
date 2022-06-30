@@ -16,10 +16,10 @@ export class BoneDemo extends Demo {
     this.bindScope()
     this.init()
     Stats.addTable('Bone', true)
-    Stats.addSlide('Delay', Bone.DEFAULT_DELAY, 1, 10, 1, 'Bone', value => {
+    Stats.addSlide('Delay', Bone.DEFAULT_DELAY, 1, 10, 1, 'Bone', (value) => {
       this.rootBone.delay = value
     })
-    Stats.addSlide('Recursion', Bone.DEFAULT_RECURSION, 1, 10, 1, 'Bone', value => {
+    Stats.addSlide('Recursion', Bone.DEFAULT_RECURSION, 1, 10, 1, 'Bone', (value) => {
       this.rootBone.recursion = value
     })
   }
@@ -41,7 +41,8 @@ export class BoneDemo extends Demo {
     object.matrixAutoUpdate = false
     this.app.scene.add(object)
     // IN BLENDER
-    const objectPosition = new THREE.Vector3(0.5, 1, 2)
+    // method 1
+    /* const objectPosition = new THREE.Vector3(0.5, 1, 2)
     const objectQuaternion = new THREE.Quaternion(0.492404, -0.369616, 0.492404, 0.615191)
     const objectRotation = new THREE.Euler().setFromQuaternion(objectQuaternion)
     const axisX = new THREE.Vector3(0, 0, 1)
@@ -52,13 +53,40 @@ export class BoneDemo extends Demo {
     const RZ = new THREE.Matrix4().makeRotationAxis(axisZ, objectRotation.z)
     objectPosition.applyMatrix4(BlenderUtil.THREE_MATRIX)
     const T = new THREE.Matrix4().setPosition(objectPosition)
-    const matrix = new THREE.Matrix4().multiply(RX).multiply(RY).multiply(RZ).copyPosition(T)
+    const matrix = new THREE.Matrix4().multiply(RX).multiply(RY).multiply(RZ).copyPosition(T) */
 
     // console.info(matrix)
     // const objectMatrixInThree = BlenderUtil.toThree(objectMatrix)
     // console.info(objectMatrixInThree)
-    object.matrix.copy(matrix)
-    object.updateMatrixWorld()
+    // Vt=(Rx90Ry90Vb)I
+    const Vb = new THREE.Vector3(0.5, 1, 2)
+    const Qb = new THREE.Quaternion(0.492404, -0.369616, 0.492404, 0.615191)
+    const axisX = new THREE.Vector3(1, 0, 0)
+    const axisY = new THREE.Vector3(0, 1, 0)
+    const Rx90 = new THREE.Matrix4().makeRotationAxis(axisX, Math.PI / 2)
+    const Ry90 = new THREE.Matrix4().makeRotationAxis(axisY, Math.PI / 2)
+    const M = new THREE.Matrix4().multiplyMatrices(Rx90, Ry90).invert()
+    const Vt = new THREE.Vector3().copy(Vb).applyMatrix4(M)
+
+    // method 2
+    const Rb = new THREE.Euler().setFromQuaternion(Qb)
+    const Ax = new THREE.Vector3()
+    const Ay = new THREE.Vector3()
+    const Az = new THREE.Vector3()
+    M.extractBasis(Ax, Ay, Az)
+    const Rx = new THREE.Matrix4().makeRotationAxis(Ax, Rb.x)
+    const Ry = new THREE.Matrix4().makeRotationAxis(Ay, Rb.y)
+    const Rz = new THREE.Matrix4().makeRotationAxis(Az, Rb.z)
+    const Rt = new THREE.Matrix4().multiply(Rx).multiply(Ry).multiply(Rz)
+    M.copy(Rt).setPosition(Vt)
+
+    // method 3
+    // const I = new THREE.Matrix4().copy(M).invert()
+    // const mb = new THREE.Matrix4().makeRotationFromQuaternion(Qb)
+    // // mb.multiply(I).setPosition(Vt)
+    // const V = new THREE.Vector3().copy(Vb).applyMatrix4(mb)
+    // object.position.copy(V)
+    // object.updateMatrix()
     // tweenObject.rotation = objectRotation
     // tweenObject.object = object
 
