@@ -63,18 +63,17 @@ export class BoneDemo extends Demo {
 
     const Vt = BlenderUtil.toThree(Vb)
     const Qt = BlenderUtil.toThree(Qb)
+    const St = new THREE.Vector3(1, 1, 1)
+    const Mt = new THREE.Matrix4().compose(Vt, Qt, St)
+    container.matrix.copy(Mt)
+    container.updateMatrixWorld()
 
     // method 3
     // const I = new THREE.Matrix4().copy(M).invert()
     // const mb = new THREE.Matrix4().makeRotationFromQuaternion(Qb)
     // mb.multiply(I).setPosition(Vt)
     // const V = new THREE.Vector3().copy(Vb).applyMatrix4(mb)
-    const St = new THREE.Vector3()
-    const Mt = new THREE.Matrix4().compose(Vt, Qt, St)
-    console.info(Vt, Qt, Mt)
-    container.position.copy(Vt)
-    container.quaternion.copy(Qt)
-    container.updateMatrix()
+
     // tweenObject.rotation = objectRotation
     // tweenObject.object = object
 
