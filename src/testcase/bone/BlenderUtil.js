@@ -24,30 +24,41 @@ class BlenderUtil {
 
   /**
    * blender转换矩阵
+   * Mt=(Rx90Ry90Mb)I
    * @param {*} matrixInThree
    */
   makeBlenderMatrix() {
-    // α = 绕z轴逆时针旋转，β = 继续绕x轴旋转后的轴，逆时针旋转
-    // M = Rz(α)·Rz(π/2 - α)·Ry(β)·Rz(α - π/2)·T(x, y, z)
-    const axisX = new THREE.Vector3(0, 1, 0)
-    const axisY = new THREE.Vector3(0, 0, 1)
-    const axisZ = new THREE.Vector3(1, 0, 0)
-    const blenderMatrix = new THREE.Matrix4().makeBasis(axisX, axisY, axisZ)
-    return blenderMatrix
+    const axisX = new THREE.Vector3(1, 0, 0)
+    const axisY = new THREE.Vector3(0, 1, 0)
+    const Rx90 = new THREE.Matrix4().makeRotationAxis(axisX, Math.PI / 2)
+    const Ry90 = new THREE.Matrix4().makeRotationAxis(axisY, Math.PI / 2)
+    const M = new THREE.Matrix4().multiplyMatrices(Rx90, Ry90).invert()
+    return M
   }
 
   /**
-   * 转换到blender坐标系
+   * 转换到three坐标系
    */
-  toBlender(target) {
-    /* if (target instanceof THREE.Vector3) {
-      const vectorBlender = new THREE.Vector3().copy(target).applyMatrix4(this.BLENDER_MATRIX)
-      return vectorBlender
-    } else if (target instanceof THREE.Euler) {
-      // const eulerBlender = new THREE.Euler(target.z, target.x, target.y)
-      const eulerBlender = new THREE.Euler().copy(target)
-      return eulerBlender
-    } else if (target instanceof THREE.Matrix4) {
+  toThree(target) {
+    if (target instanceof THREE.Vector3) {
+      const Vb = new THREE.Vector3().copy(target)
+      const Vt = new THREE.Vector3().copy(Vb).applyMatrix4(this.BLENDER_MATRIX)
+      return Vt
+    } else if (target instanceof THREE.Quaternion) {
+      const Qb = new THREE.Quaternion().copy(target)
+      const Ax = new THREE.Vector3()
+      const Ay = new THREE.Vector3()
+      const Az = new THREE.Vector3()
+      this.BLENDER_MATRIX.extractBasis(Ax, Ay, Az)
+      const Rb = new THREE.Euler().setFromQuaternion(Qb)
+      const Rx = new THREE.Matrix4().makeRotationAxis(Ax, Rb.x)
+      const Ry = new THREE.Matrix4().makeRotationAxis(Ay, Rb.y)
+      const Rz = new THREE.Matrix4().makeRotationAxis(Az, Rb.z)
+      const Rt = new THREE.Matrix4().multiply(Rx).multiply(Ry).multiply(Rz)
+      const Qt = new THREE.Quaternion().setFromRotationMatrix(Rt)
+
+      return Qt
+    } /*else if (target instanceof THREE.Matrix4) {
       // 提取位置
       const position = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
       // 还原至原点
@@ -60,25 +71,10 @@ class BlenderUtil {
   }
 
   /**
-   * 转换为three坐标系
+   * 转换为blender坐标系
    * @param {*} target
    */
-  toThree(target) {
-    if (target instanceof THREE.Vector3) {
-      const vectorThree = new THREE.Vector3().copy(target).applyMatrix4(this.THREE_MATRIX)
-      return vectorThree
-    } else if (target instanceof THREE.Euler) {
-      const eulerThree = new THREE.Euler(target.y, target.z, target.x)
-      return eulerThree
-    } else if (target instanceof THREE.Matrix4) {
-      this.BLENDER_MATRIX
-      // const positionBlender = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
-      // const positionThree = this.toThree(positionBlender)
-      // const matrixThree = new THREE.Matrix4().multiplyMatrices(target, this.THREE_MATRIX)
-      // matrixThree.setPosition(positionThree)
-      return target
-    }
-  }
+  toBlender(target) {}
 }
 
 export default new BlenderUtil()

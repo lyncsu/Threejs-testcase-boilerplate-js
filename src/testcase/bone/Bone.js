@@ -188,24 +188,24 @@ export class Bone extends THREE.Object3D {
     if (this.isRoot) {
       this.prevMatrix.copy(this.matrixWorld)
       this.childBone && this.childBone.iterate()
-      this.#createMatrixHelper(BlenderUtil.THREE_MATRIX)
+      this.#createMatrixHelper(BlenderUtil.BLENDER_MATRIX)
       return
     }
 
     // phase1
     const nextMatrix = new THREE.Matrix4()
-    const cur_p_mt = BlenderUtil.toBlender(new THREE.Matrix4().copy(this.rootBone.matrixWorld))
+    // const cur_p_mt = BlenderUtil.toBlender(new THREE.Matrix4().copy(this.rootBone.matrixWorld))
     // ✔️
     // console.info(currentParentMatrix.elements)
     // const currentParentBlender = new THREE.Matrix4().multiplyMatrices(currentParentMatrix, this.#blenderMatrix)
-    const currentParentT = new THREE.Matrix4().copy(cur_p_mt).transpose()
+    // const currentParentT = new THREE.Matrix4().copy(cur_p_mt).transpose()
     // console.info('T', currentParentT.elements)
-    // const prevMatrix = this.#toBlender(this.prevMatrix)
-    const boneLengthVector = new THREE.Vector3(0, this.parentBone.length, 0)
-    const boneLengthMatrix = new THREE.Matrix4().setPosition(boneLengthVector)
-    const boneLengthMatrixBlender = BlenderUtil.toBlender(boneLengthMatrix)
-    const boneLengthMatrixThree = BlenderUtil.toThree(boneLengthMatrixBlender)
-    const targetMatrix = new THREE.Matrix4().multiplyMatrices(boneLengthMatrixThree, cur_p_mt)
+    // // const prevMatrix = this.#toBlender(this.prevMatrix)
+    // const boneLengthVector = new THREE.Vector3(0, this.parentBone.length, 0)
+    // const boneLengthMatrix = new THREE.Matrix4().setPosition(boneLengthVector)
+    // const boneLengthMatrixBlender = BlenderUtil.toBlender(boneLengthMatrix)
+    // const boneLengthMatrixThree = BlenderUtil.toThree(boneLengthMatrixBlender)
+    // const targetMatrix = new THREE.Matrix4().multiplyMatrices(boneLengthMatrixThree, cur_p_mt)
     /* const parentMatrixWorld = new THREE.Matrix4().copy(this.parent.matrixWorld)
     const parentMatrix = new THREE.Matrix4().copy(this.parent.matrix)
     
@@ -307,8 +307,8 @@ export class Bone extends THREE.Object3D {
   ) {
     let hasHelper = false
     this.rootBone.scene.children
-      .filter((child) => this.#isHelperExsit(child, name, THREE.ArrowHelper))
-      .forEach((child) => {
+      .filter(child => this.#isHelperExsit(child, name, THREE.ArrowHelper))
+      .forEach(child => {
         hasHelper = true
         const worldTarget = new THREE.Vector3().copy(target).applyMatrix4(child.parent.matrixWorld)
         child.setDirection(worldTarget)
@@ -341,8 +341,8 @@ export class Bone extends THREE.Object3D {
   #createPositionHelper(target, name = 'positionHelperTarget') {
     let hasHelper = false
     this.rootBone.scene.children
-      .filter((child) => this.#isHelperExsit(child, name, THREE.AxesHelper))
-      .forEach((child) => {
+      .filter(child => this.#isHelperExsit(child, name, THREE.AxesHelper))
+      .forEach(child => {
         hasHelper = true
         child.position.copy(target)
       })
@@ -372,8 +372,8 @@ export class Bone extends THREE.Object3D {
   #createAxesHelper(target, name = 'axesHelper') {
     let hasHelper = false
     this.rootBone.scene.children
-      .filter((child) => this.#isHelperExsit(child, name, THREE.AxesHelper))
-      .forEach((child) => {
+      .filter(child => this.#isHelperExsit(child, name, THREE.AxesHelper))
+      .forEach(child => {
         hasHelper = true
         child.matrix.copy(target)
         child.updateWorldMatrix(true, false)
