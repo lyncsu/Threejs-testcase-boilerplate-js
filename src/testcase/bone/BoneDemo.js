@@ -16,10 +16,10 @@ export class BoneDemo extends Demo {
     this.bindScope()
     this.init()
     Stats.addTable('Bone', true)
-    Stats.addSlide('Delay', Bone.DEFAULT_DELAY, 1, 10, 1, 'Bone', (value) => {
+    Stats.addSlide('Delay', Bone.DEFAULT_DELAY, 1, 10, 1, 'Bone', value => {
       this.rootBone.delay = value
     })
-    Stats.addSlide('Recursion', Bone.DEFAULT_RECURSION, 1, 10, 1, 'Bone', (value) => {
+    Stats.addSlide('Recursion', Bone.DEFAULT_RECURSION, 1, 10, 1, 'Bone', value => {
       this.rootBone.recursion = value
     })
   }
@@ -27,23 +27,25 @@ export class BoneDemo extends Demo {
   bindScope() {}
 
   init() {
+    const Vb = new THREE.Vector3()
+    const Qb = new THREE.Quaternion(0.335448, -0.066725, -0.183326, 0.921637)
+
     const container = new THREE.Object3D()
-    const rotation = new THREE.Euler((Math.PI / 180) * 40, 0, (Math.PI / 180) * -22.5)
-    // container.rotation.copy(rotation)
-    container.visible = false
+    container.matrixAutoUpdate = false
+    // container.quaternion.copy(quaternion)
 
     // const geometry = new THREE.ConeBufferGeometry(0.1, 0.2, 10)
     const geometry = new THREE.BoxBufferGeometry(1, 1, 1)
     geometry.center()
     geometry.scale(0.1, 0.2, 0.3)
     // geometry.translate(0, 0.1, 0)
-    const object = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial())
-    object.matrixAutoUpdate = false
-    this.app.scene.add(object)
+    // const object = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial())
+    // object.matrixAutoUpdate = false
+    // this.app.scene.add(object)
     // IN BLENDER
     // method 1
     /* const objectPosition = new THREE.Vector3(0.5, 1, 2)
-    const objectQuaternion = new THREE.Quaternion(0.492404, -0.369616, 0.492404, 0.615191)
+    const objectQuaternion = new THREE.Quaternion(0.492404, -0.369616, 0.492404, 0.921637)
     const objectRotation = new THREE.Euler().setFromQuaternion(objectQuaternion)
     const axisX = new THREE.Vector3(0, 0, 1)
     const axisY = new THREE.Vector3(1, 0, 0)
@@ -58,35 +60,20 @@ export class BoneDemo extends Demo {
     // console.info(matrix)
     // const objectMatrixInThree = BlenderUtil.toThree(objectMatrix)
     // console.info(objectMatrixInThree)
-    // Vt=(Rx90Ry90Vb)I
-    const Vb = new THREE.Vector3(0.5, 1, 2)
-    const Qb = new THREE.Quaternion(0.492404, -0.369616, 0.492404, 0.615191)
-    const axisX = new THREE.Vector3(1, 0, 0)
-    const axisY = new THREE.Vector3(0, 1, 0)
-    const Rx90 = new THREE.Matrix4().makeRotationAxis(axisX, Math.PI / 2)
-    const Ry90 = new THREE.Matrix4().makeRotationAxis(axisY, Math.PI / 2)
-    const M = new THREE.Matrix4().multiplyMatrices(Rx90, Ry90).invert()
-    const Vt = new THREE.Vector3().copy(Vb).applyMatrix4(M)
 
-    // method 2
-    const Rb = new THREE.Euler().setFromQuaternion(Qb)
-    const Ax = new THREE.Vector3()
-    const Ay = new THREE.Vector3()
-    const Az = new THREE.Vector3()
-    M.extractBasis(Ax, Ay, Az)
-    const Rx = new THREE.Matrix4().makeRotationAxis(Ax, Rb.x)
-    const Ry = new THREE.Matrix4().makeRotationAxis(Ay, Rb.y)
-    const Rz = new THREE.Matrix4().makeRotationAxis(Az, Rb.z)
-    const Rt = new THREE.Matrix4().multiply(Rx).multiply(Ry).multiply(Rz)
-    M.copy(Rt).setPosition(Vt)
+    const Vt = BlenderUtil.toThree(Vb)
+    const Qt = BlenderUtil.toThree(Qb)
+    const St = new THREE.Vector3(1, 1, 1)
+    const Mt = new THREE.Matrix4().compose(Vt, Qt, St)
+    container.matrix.copy(Mt)
+    container.updateMatrixWorld()
 
     // method 3
     // const I = new THREE.Matrix4().copy(M).invert()
     // const mb = new THREE.Matrix4().makeRotationFromQuaternion(Qb)
-    // // mb.multiply(I).setPosition(Vt)
+    // mb.multiply(I).setPosition(Vt)
     // const V = new THREE.Vector3().copy(Vb).applyMatrix4(mb)
-    // object.position.copy(V)
-    // object.updateMatrix()
+
     // tweenObject.rotation = objectRotation
     // tweenObject.object = object
 
