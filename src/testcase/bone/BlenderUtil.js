@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { Constant } from '../../Constant'
 
 /**
  * blender转换工具
@@ -28,12 +29,12 @@ class BlenderUtil {
    * @param {*} matrixInThree
    */
   makeBlenderMatrix() {
-    const axisX = new THREE.Vector3(1, 0, 0)
-    const axisY = new THREE.Vector3(0, 1, 0)
-    const Rx90 = new THREE.Matrix4().makeRotationAxis(axisX, Math.PI / 2)
-    const Ry90 = new THREE.Matrix4().makeRotationAxis(axisY, Math.PI / 2)
-    const M = new THREE.Matrix4().multiplyMatrices(Rx90, Ry90).invert()
-    return M
+    const Ax = new THREE.Vector3(1, 0, 0)
+    const Ay = new THREE.Vector3(0, 1, 0)
+    const Rx90 = new THREE.Matrix4().makeRotationAxis(Ax, Math.PI / 2)
+    const Ry90 = new THREE.Matrix4().makeRotationAxis(Ay, Math.PI / 2)
+    const Mb = new THREE.Matrix4().multiplyMatrices(Rx90, Ry90).invert()
+    return Mb
   }
 
   /**
@@ -74,7 +75,26 @@ class BlenderUtil {
    * 转换为blender坐标系
    * @param {*} target
    */
-  toBlender(target) {}
+  toBlender(target) {
+    if (target instanceof THREE.Matrix4) {
+      // method 1 success
+      /* const Mt = new THREE.Matrix4().copy(target)
+      const Pt = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
+      const Rt = new THREE.Matrix4().extractRotation(Mt)
+      const Ax = new THREE.Vector3()
+      const Ay = new THREE.Vector3()
+      const Az = new THREE.Vector3()
+      Rt.extractBasis(Ax, Ay, Az)
+      const Rx90 = new THREE.Matrix4().makeRotationAxis(Ax, Math.PI / 2).invert()
+      const Ry90 = new THREE.Matrix4().makeRotationAxis(Ay, Math.PI / 2).invert()
+      const Mb = new THREE.Matrix4().copy(Mt).premultiply(Rx90).premultiply(Ry90).setPosition(Pt) */
+
+      const Mt = new THREE.Matrix4().copy(target)
+      const Mb = new THREE.Matrix4().multiplyMatrices(Mt, this.BLENDER_MATRIX)
+
+      return Mb
+    }
+  }
 }
 
 export default new BlenderUtil()
