@@ -25,7 +25,7 @@ class BlenderUtil {
 
   /**
    * blender转换矩阵
-   * Mt=(Rx-90Ry-90Mb)I
+   * Mb=Rx-90Ry-90Mt
    * @param {*} matrixInThree
    */
   makeBlenderMatrix() {
@@ -78,19 +78,20 @@ class BlenderUtil {
   toBlender(target) {
     if (target instanceof THREE.Matrix4) {
       // method 1 success
-      /* const Mt = new THREE.Matrix4().copy(target)
+      const Mt = new THREE.Matrix4().copy(target)
       const Pt = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
       const Rt = new THREE.Matrix4().extractRotation(Mt)
       const Ax = new THREE.Vector3()
       const Ay = new THREE.Vector3()
       const Az = new THREE.Vector3()
       Rt.extractBasis(Ax, Ay, Az)
-      const Rx90 = new THREE.Matrix4().makeRotationAxis(Ax, Math.PI / 2).invert()
-      const Ry90 = new THREE.Matrix4().makeRotationAxis(Ay, Math.PI / 2).invert()
-      const Mb = new THREE.Matrix4().copy(Mt).premultiply(Rx90).premultiply(Ry90).setPosition(Pt) */
+      const Rx90 = new THREE.Matrix4().makeRotationAxis(Ax, -Math.PI / 2)
+      const Ry90 = new THREE.Matrix4().makeRotationAxis(Ay, -Math.PI / 2)
+      const Mb = new THREE.Matrix4().copy(Mt).premultiply(Rx90).premultiply(Ry90).setPosition(Pt)
 
-      const Mt = new THREE.Matrix4().copy(target)
-      const Mb = new THREE.Matrix4().multiplyMatrices(Mt, this.BLENDER_MATRIX)
+      // method 2 success
+      /* const Mt = new THREE.Matrix4().copy(target)
+      const Mb = new THREE.Matrix4().multiplyMatrices(Mt, this.BLENDER_MATRIX) */
 
       return Mb
     }
