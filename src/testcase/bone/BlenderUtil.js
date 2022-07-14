@@ -25,15 +25,15 @@ class BlenderUtil {
 
   /**
    * blender转换矩阵
-   * Mt=(Rx90Ry90Mb)I
+   * Mt=(Rx-90Ry-90Mb)I
    * @param {*} matrixInThree
    */
   makeBlenderMatrix() {
     const Ax = new THREE.Vector3(1, 0, 0)
     const Ay = new THREE.Vector3(0, 1, 0)
-    const Rx90 = new THREE.Matrix4().makeRotationAxis(Ax, Math.PI / 2)
-    const Ry90 = new THREE.Matrix4().makeRotationAxis(Ay, Math.PI / 2)
-    const Mb = new THREE.Matrix4().multiplyMatrices(Rx90, Ry90).invert()
+    const Rxn90 = new THREE.Matrix4().makeRotationAxis(Ax, -Math.PI / 2)
+    const Ryn90 = new THREE.Matrix4().makeRotationAxis(Ay, -Math.PI / 2)
+    const Mb = new THREE.Matrix4().premultiply(Rxn90).premultiply(Ryn90)
     return Mb
   }
 
