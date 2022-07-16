@@ -195,7 +195,9 @@ export class Bone extends THREE.Object3D {
     // phase1
     const nextMatrix = new THREE.Matrix4()
     const rootMatrix = new THREE.Matrix4().copy(this.rootBone.matrixWorld)
-    const cur_p_mt = BlenderUtil.toBlender(rootMatrix)
+    const m3 = new THREE.Matrix3().set(1, 0, 0, 0, 0, -1, 0, 1, 0)
+    const obj_list0_parent = new THREE.Matrix4().setFromMatrix3(m3)
+    const cur_p_mt = BlenderUtil.toBlender(rootMatrix).multiply(obj_list0_parent)
     // ✔️
     // console.info(currentParentMatrix.elements)
     // const currentParentBlender = new THREE.Matrix4().multiplyMatrices(currentParentMatrix, this.#blenderMatrix)
@@ -308,8 +310,8 @@ export class Bone extends THREE.Object3D {
   ) {
     let hasHelper = false
     this.rootBone.scene.children
-      .filter((child) => this.#isHelperExsit(child, name, THREE.ArrowHelper))
-      .forEach((child) => {
+      .filter(child => this.#isHelperExsit(child, name, THREE.ArrowHelper))
+      .forEach(child => {
         hasHelper = true
         const worldTarget = new THREE.Vector3().copy(target).applyMatrix4(child.parent.matrixWorld)
         child.setDirection(worldTarget)
@@ -342,8 +344,8 @@ export class Bone extends THREE.Object3D {
   #createPositionHelper(target, name = 'positionHelperTarget') {
     let hasHelper = false
     this.rootBone.scene.children
-      .filter((child) => this.#isHelperExsit(child, name, THREE.AxesHelper))
-      .forEach((child) => {
+      .filter(child => this.#isHelperExsit(child, name, THREE.AxesHelper))
+      .forEach(child => {
         hasHelper = true
         child.position.copy(target)
       })
@@ -373,8 +375,8 @@ export class Bone extends THREE.Object3D {
   #createAxesHelper(target, name = 'axesHelper') {
     let hasHelper = false
     this.rootBone.scene.children
-      .filter((child) => this.#isHelperExsit(child, name, THREE.AxesHelper))
-      .forEach((child) => {
+      .filter(child => this.#isHelperExsit(child, name, THREE.AxesHelper))
+      .forEach(child => {
         hasHelper = true
         child.matrix.copy(target)
         child.updateWorldMatrix(true, false)

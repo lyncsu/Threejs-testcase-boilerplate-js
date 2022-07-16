@@ -78,7 +78,7 @@ class BlenderUtil {
   toBlender(target) {
     if (target instanceof THREE.Matrix4) {
       // method 1 success
-      const Mt = new THREE.Matrix4().copy(target)
+      /* const Mt = new THREE.Matrix4().copy(target)
       const Pt = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
       const Rt = new THREE.Matrix4().extractRotation(Mt)
       const Ax = new THREE.Vector3()
@@ -87,11 +87,11 @@ class BlenderUtil {
       Rt.extractBasis(Ax, Ay, Az)
       const Rx90 = new THREE.Matrix4().makeRotationAxis(Ax, -Math.PI / 2)
       const Ry90 = new THREE.Matrix4().makeRotationAxis(Ay, -Math.PI / 2)
-      const Mb = new THREE.Matrix4().copy(Mt).premultiply(Rx90).premultiply(Ry90).setPosition(Pt)
+      const Mb = new THREE.Matrix4().copy(Mt).premultiply(Ry90).premultiply(Rx90).setPosition(Pt) */
 
       // method 2 success
-      /* const Mt = new THREE.Matrix4().copy(target)
-      const Mb = new THREE.Matrix4().multiplyMatrices(Mt, this.BLENDER_MATRIX) */
+      const Mt = new THREE.Matrix4().copy(target)
+      const Mb = new THREE.Matrix4().multiplyMatrices(Mt, this.BLENDER_MATRIX)
 
       return Mb
     }
