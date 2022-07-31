@@ -59,15 +59,18 @@ class BlenderUtil {
       const Qt = new THREE.Quaternion().setFromRotationMatrix(Rt)
 
       return Qt
-    } /*else if (target instanceof THREE.Matrix4) {
+    } else if (target instanceof THREE.Matrix4) {
       // 提取位置
-      const position = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
+      // const position = new THREE.Vector3(target.elements[12], target.elements[13], target.elements[14])
       // 还原至原点
-      const positionBlender = this.toBlender(position)
-      const matrixBlender = new THREE.Matrix4().multiplyMatrices(target, this.BLENDER_MATRIX)
-      matrixBlender.setPosition(positionBlender)
-      return matrixBlender
-    } */
+      // const positionBlender = this.toBlender(position)
+      // const matrixBlender = new THREE.Matrix4().multiplyMatrices(target, this.BLENDER_MATRIX)
+      // matrixBlender.setPosition(positionBlender)
+      // return matrixBlender
+      const Mb = new THREE.Matrix4().copy(target)
+      const Mt = new THREE.Matrix4().multiplyMatrices(Mb, this.THREE_MATRIX)
+      return Mt
+    }
     return target
   }
 
@@ -94,7 +97,20 @@ class BlenderUtil {
       const Mb = new THREE.Matrix4().multiplyMatrices(Mt, this.BLENDER_MATRIX)
 
       return Mb
+    } else if (target instanceof THREE.Vector3) {
+      const Vb = new THREE.Vector3().copy(target).applyMatrix4(this.BLENDER_MATRIX)
+      return Vb
     }
+  }
+
+  /**
+   * 转置矩阵
+   */
+  transpose(Mb) {
+    const Mt = this.toThree(Mb)
+    const MtT = Mt.transpose()
+    const MbT = this.toBlender(MtT)
+    return MbT
   }
 }
 

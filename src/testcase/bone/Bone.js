@@ -197,8 +197,10 @@ export class Bone extends THREE.Object3D {
     const rootMatrix = new THREE.Matrix4().copy(this.rootBone.matrixWorld)
     const m3 = new THREE.Matrix3().set(1, 0, 0, 0, 0, -1, 0, 1, 0)
     const obj_list0_parent = new THREE.Matrix4().setFromMatrix3(m3)
-    const cur_p_mt = BlenderUtil.toBlender(rootMatrix).multiply(obj_list0_parent)
-    // ✔️
+    const cur_p_mt = BlenderUtil.toBlender(rootMatrix).multiply(obj_list0_parent) // ✔️
+    const cur_p_mt_t = BlenderUtil.transpose(cur_p_mt) // ✔️
+    const bone_vec = BlenderUtil.toBlender(new THREE.Vector3(0, this.length, 0))
+    const obj_length = BlenderUtil.toBlender(new THREE.Matrix4().setPosition(bone_vec)) // ✔️
     // console.info(currentParentMatrix.elements)
     // const currentParentBlender = new THREE.Matrix4().multiplyMatrices(currentParentMatrix, this.#blenderMatrix)
     // const currentParentT = new THREE.Matrix4().copy(cur_p_mt).transpose()
@@ -275,7 +277,7 @@ export class Bone extends THREE.Object3D {
         // this.#createDirectionHelper(boneLengthVectorBlender)
         // this.#createDirectionHelper(targetDirectionY, 'targetDirectionX', 0xff000e)
         // this.#createPositionHelper(bonePosition)
-        this.#createMatrixHelper(cur_p_mt, null, true)
+        this.#createMatrixHelper(obj_length)
         // this.#createAxesHelper(currentParentMatrix)
       }
     }
@@ -361,7 +363,7 @@ export class Bone extends THREE.Object3D {
    * matrix辅助器
    * @returns
    */
-  #createMatrixHelper(target, name = 'matrixHelper', noWorldTransform = false) {
+  #createMatrixHelper(target, name = 'matrixHelper', noWorldTransform = true) {
     if (!target) target = new THREE.Matrix4()
     const axisX = MathUtil.extractDirection(target, 'x')
     const axisY = MathUtil.extractDirection(target, 'y')
